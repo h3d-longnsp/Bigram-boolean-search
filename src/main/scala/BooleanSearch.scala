@@ -39,6 +39,14 @@ object BooleanSearch {
     q1.diff(q2)
   }
 
+  /**
+    * TODO: Add document
+    *
+    * @param index
+    * @param term1
+    * @param term2
+    * @return
+    */
   private def searchOrNot(index: Map[String, List[Int]], term1: String, term2: String): List[Int] = {
     val q1 = search(index, term1)
     val q2 = search(index, term2)
@@ -48,16 +56,11 @@ object BooleanSearch {
   }
 
   def main(args: Array[String]): Unit = {
-    val index = Indexer.load("output/index.txt")
+    val unigramIndex = Indexer.loadIndex("output/index-unigram1.txt")
+    val bigramIndex = Indexer.loadIndex("output/index-bigram1.txt")
 
-    // val index = Map(
-    //   "tom" -> List(1, 4, 8, 10),
-    //   "jerry" -> List(1, 4, 7),
-    //   "dog" -> List(1, 7, 11, 13),
-    //   "love" -> List(2, 4, 7)
-    // )
-
-    println(search(index, "accion"))
-
+    val combineIndex = unigramIndex ++ bigramIndex
+    println(search(combineIndex, "ago"))
+    println(search(combineIndex, "the tokyo"))
   }
 }
