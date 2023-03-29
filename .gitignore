@@ -1,0 +1,9 @@
+# git
+.git/
+
+# vscode
+.bloop/
+.metals/
+.vscode/
+project/
+target/
