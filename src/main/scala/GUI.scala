@@ -8,17 +8,23 @@ import javax.swing.JScrollPane
 import javax.swing.JButton
 import javax.swing.JPanel
 import javax.swing.BorderFactory
+import javax.swing.ScrollPaneConstants
+import javax.swing.UIManager
 
 object GUI {
     var index: Map[String, List[Int]] = Map.empty
-    val textArea = new JTextArea()
+    var inputFolderPath = ""
+    var indexFilePath = ""
+    val vocabTextArea = new JTextArea()
+    val filePathTextArea = new JTextArea(1, 1)
+    val folderPathTextArea = new JTextArea(1, 1)
 
     private def createWindow(): Unit = {
         val frame = new JFrame("Bigram Boolean Search")
         val panel = new JPanel();
         panel.setLayout(null)
         panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10))
-        frame.setSize(1050, 600)
+        frame.setSize(1050, 750)
         frame.setResizable(false)
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE)
         createUI(frame, panel)
@@ -29,6 +35,7 @@ object GUI {
 
     private def createUI(frame: JFrame, panel: JPanel): Unit = {
         createMenuBar(frame)
+        createPathsArea(panel)
         createVocabArea(panel)
         createButton(panel)
     }
@@ -54,11 +61,7 @@ object GUI {
         fileMenuItem1.addActionListener(new ActionListener {
           override def actionPerformed(e: ActionEvent): Unit = {
             if (folderChooser.showOpenDialog(fileMenuItem1) == JFileChooser.APPROVE_OPTION) {
-              val folderPath = folderChooser.getSelectedFile().getPath()
-              synchronized {
-                println("inside ")
-                println("path: " + folderPath)    
-              }
+              inputFolderPath = folderChooser.getSelectedFile().getPath()
             }
           }
         })
@@ -66,12 +69,7 @@ object GUI {
         fileMenuItem2.addActionListener(new ActionListener {
           override def actionPerformed(e: ActionEvent): Unit = {
             if (fileChooser.showOpenDialog(fileMenuItem1) == JFileChooser.APPROVE_OPTION) {
-              val filePath = fileChooser.getSelectedFile().getPath()
-              synchronized {
-                println("inside ")
-                index = Indexer.loadIndex(filePath)                
-                println(index.take(5).foreach(println))
-              }
+              indexFilePath = fileChooser.getSelectedFile().getPath()
             }
           }
         })
@@ -95,15 +93,15 @@ object GUI {
 
     def createButton(panel: JPanel): Unit = {
         val buildVocabBtn = new JButton("Build Vocab")
-        buildVocabBtn.setBounds(30, 500, 150, 25)
+        buildVocabBtn.setBounds(30, 650, 150, 25)
 
         val buildIndexBtn = new JButton("Build Index")
-        buildIndexBtn.setBounds(200, 500, 150, 25)
+        buildIndexBtn.setBounds(200, 650, 150, 25)
 
         buildVocabBtn.addActionListener(new ActionListener {
           override def actionPerformed(e: ActionEvent): Unit = {
             val liststr = List("123", "asafa")
-            textArea.setText(liststr.mkString("\n"))
+            vocabTextArea.setText(liststr.mkString("\n"))
           }
         })
 
@@ -112,16 +110,41 @@ object GUI {
     }
 
     def createVocabArea(panel: JPanel): Unit = {
-        textArea.setEditable(false)
-        textArea.setColumns(1)
-    
-        val scrollPane = new JScrollPane(textArea)
-        scrollPane.setBounds(30, 15, 150, 475)
+        vocabTextArea.setEditable(false)
+        vocabTextArea.setColumns(1)
+        
+        val borderVocab = BorderFactory.createTitledBorder("Vocabulary")
+        vocabTextArea.setBorder(borderVocab)
+
+        val scrollPane = new JScrollPane(vocabTextArea)
+        scrollPane.setBounds(30, 125, 150, 515)
         panel.add(scrollPane)
     }
 
-    def refreshUI(frame: JFrame): Unit = {
-        frame.getContentPane()
+    def createPathsArea(panel: JPanel): Unit = {
+        UIManager.put("ScrollBar.width", 10);
+        
+        folderPathTextArea.setEditable(false)
+        filePathTextArea.setEditable(false)
+        
+        val border1 = BorderFactory.createTitledBorder("Input folder")
+        val scrollPane1 = new JScrollPane(folderPathTextArea)
+        scrollPane1.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER)
+        folderPathTextArea.setBorder(border1)
+
+        val border2 = BorderFactory.createTitledBorder("Index file")
+        val scrollPane2 = new JScrollPane(filePathTextArea)
+        scrollPane2.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER)        
+        filePathTextArea.setBorder(border2)
+
+        folderPathTextArea.setText("/home/lovell/classroom/afsfas/f")
+        filePathTextArea.setText("/home/lovell/classroom/afaf/awr3/afafs/inputreuter/12411.txt")
+
+        scrollPane1.setBounds(30, 5, 325, 45)
+        scrollPane2.setBounds(30, 60, 325, 45)
+
+        panel.add(scrollPane1)
+        panel.add(scrollPane2)        
     }
 
     def main(args: Array[String]) {
