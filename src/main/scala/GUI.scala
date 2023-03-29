@@ -151,15 +151,14 @@ object GUI {
     vocabTextArea.setColumns(1)
 
     val borderVocab = BorderFactory.createTitledBorder("Vocabulary")
-    vocabTextArea.setBorder(borderVocab)
-
     val scrollPane = new JScrollPane(vocabTextArea)
+    scrollPane.setBorder(borderVocab)
     scrollPane.setBounds(30, 125, 150, 515)
     panel.add(scrollPane)
   }
 
   def createPathsArea(panel: JPanel): Unit = {
-    UIManager.put("ScrollBar.width", 10);
+    UIManager.put("ScrollBar.width", 12);
 
     folderPathTextArea.setEditable(false)
     filePathTextArea.setEditable(false)
@@ -169,17 +168,17 @@ object GUI {
     scrollPane1.setVerticalScrollBarPolicy(
       ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER
     )
-    folderPathTextArea.setBorder(border1)
 
     val border2 = BorderFactory.createTitledBorder("Index file")
     val scrollPane2 = new JScrollPane(filePathTextArea)
     scrollPane2.setVerticalScrollBarPolicy(
       ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER
     )
-    filePathTextArea.setBorder(border2)
 
-    scrollPane1.setBounds(30, 5, 325, 45)
-    scrollPane2.setBounds(30, 60, 325, 45)
+    scrollPane1.setBorder(border1)
+    scrollPane2.setBorder(border2)
+    scrollPane1.setBounds(30, 5, 325, 50)
+    scrollPane2.setBounds(30, 60, 325, 50)
 
     panel.add(scrollPane1)
     panel.add(scrollPane2)
@@ -187,7 +186,9 @@ object GUI {
 
   def createLoadingFrame() = {
     loadingDialog.setTitle("Building...")
-    loadingDialog.setContentPane(new JLabel(loadingIcon))  
+    loadingDialog.setResizable(false)
+    loadingDialog.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE)
+    loadingDialog.add(new JLabel(loadingIcon))  
     loadingDialog.setLocationRelativeTo(null)
     loadingDialog.pack()   
   }
