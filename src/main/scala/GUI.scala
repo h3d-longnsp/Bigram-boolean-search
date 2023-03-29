@@ -5,11 +5,10 @@ import javax.swing.filechooser.FileNameExtensionFilter
 
 object GUI {
     var index: Map[String, List[Int]] = Map.empty
-    val lock = new Object()
 
     def main(args: Array[String]) {
         val frame = new JFrame()
-        frame.setSize(600, 500)           
+        frame.setSize(1050, 600)           
         frame.setTitle("Bigram Boolean Search")
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE)
         
@@ -22,10 +21,27 @@ object GUI {
         fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY)
         fileChooser.setDialogTitle("Choose an index file")
 
-        val fileMenuItem1 = new JMenuItem("Open index")
-        val fileMenuItem2 = new JMenuItem("Quit")
+        val folderChooser = new JFileChooser()
+        folderChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        folderChooser.setDialogTitle("Choose an input folder")
+
+        val fileMenuItem1 = new JMenuItem("Open input folder")
+        val fileMenuItem2 = new JMenuItem("Open index")
+        val fileMenuItem3 = new JMenuItem("Quit")
 
         fileMenuItem1.addActionListener(new ActionListener {
+          override def actionPerformed(e: ActionEvent): Unit = {
+            if (folderChooser.showOpenDialog(fileMenuItem1) == JFileChooser.APPROVE_OPTION) {
+              val folderPath = folderChooser.getSelectedFile().getPath()
+              synchronized {
+                println("inside ")
+                println("path: " + folderPath)    
+              }
+            }
+          }
+        })
+
+        fileMenuItem2.addActionListener(new ActionListener {
           override def actionPerformed(e: ActionEvent): Unit = {
             if (fileChooser.showOpenDialog(fileMenuItem1) == JFileChooser.APPROVE_OPTION) {
               val filePath = fileChooser.getSelectedFile().getPath()
@@ -38,21 +54,24 @@ object GUI {
           }
         })
 
-        fileMenuItem2.addActionListener(new ActionListener {
+        fileMenuItem3.addActionListener(new ActionListener {
           override def actionPerformed(e: ActionEvent): Unit = {
             System.exit(0)
           }
         })
 
-        fileMenu.add(fileMenuItem1)        
-        fileMenu.add(new JSeparator()); // SEPARATOR        
+        fileMenu.add(fileMenuItem1)
         fileMenu.add(fileMenuItem2)
+        fileMenu.add(new JSeparator()); // SEPARATOR        
+        fileMenu.add(fileMenuItem3)
 
         val menuBar = new JMenuBar
         menuBar.add(fileMenu)
         menuBar.add(helpMenu)
 
         frame.setJMenuBar(menuBar)
+        // frame.pack()
+        frame.setResizable(false)
         frame.setVisible(true)
     }
 }
