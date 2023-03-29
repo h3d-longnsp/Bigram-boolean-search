@@ -2,16 +2,38 @@ import javax.swing.{ JFrame, WindowConstants, JMenu, JMenuBar, JMenuItem, JSepar
 import java.awt.event.ActionListener
 import java.awt.event.ActionEvent
 import javax.swing.filechooser.FileNameExtensionFilter
+import javax.swing.JTextArea
+import java.awt.BorderLayout
+import javax.swing.JScrollPane
+import javax.swing.JButton
+import javax.swing.JPanel
+import javax.swing.BorderFactory
 
 object GUI {
     var index: Map[String, List[Int]] = Map.empty
+    val textArea = new JTextArea()
 
-    def main(args: Array[String]) {
-        val frame = new JFrame()
-        frame.setSize(1050, 600)           
-        frame.setTitle("Bigram Boolean Search")
+    private def createWindow(): Unit = {
+        val frame = new JFrame("Bigram Boolean Search")
+        val panel = new JPanel();
+        panel.setLayout(null)
+        panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10))
+        frame.setSize(1050, 600)
+        frame.setResizable(false)
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE)
-        
+        createUI(frame, panel)
+        // frame.pack()
+        frame.add(panel)
+        frame.setVisible(true)
+    }
+
+    private def createUI(frame: JFrame, panel: JPanel): Unit = {
+        createMenuBar(frame)
+        createVocabArea(panel)
+        createButton(panel)
+    }
+
+    def createMenuBar(frame: JFrame): Unit = {
         val fileMenu = new JMenu("File")
         val helpMenu = new JMenu("Help")
         
@@ -68,11 +90,42 @@ object GUI {
         val menuBar = new JMenuBar
         menuBar.add(fileMenu)
         menuBar.add(helpMenu)
-
         frame.setJMenuBar(menuBar)
-        // frame.pack()
-        frame.setResizable(false)
-        frame.setVisible(true)
+    }
+
+    def createButton(panel: JPanel): Unit = {
+        val buildVocabBtn = new JButton("Build Vocab")
+        buildVocabBtn.setBounds(30, 500, 150, 25)
+
+        val buildIndexBtn = new JButton("Build Index")
+        buildIndexBtn.setBounds(200, 500, 150, 25)
+
+        buildVocabBtn.addActionListener(new ActionListener {
+          override def actionPerformed(e: ActionEvent): Unit = {
+            val liststr = List("123", "asafa")
+            textArea.setText(liststr.mkString("\n"))
+          }
+        })
+
+        panel.add(buildVocabBtn)
+        panel.add(buildIndexBtn)
+    }
+
+    def createVocabArea(panel: JPanel): Unit = {
+        textArea.setEditable(false)
+        textArea.setColumns(1)
+    
+        val scrollPane = new JScrollPane(textArea)
+        scrollPane.setBounds(30, 15, 150, 475)
+        panel.add(scrollPane)
+    }
+
+    def refreshUI(frame: JFrame): Unit = {
+        frame.getContentPane()
+    }
+
+    def main(args: Array[String]) {
+        createWindow()
     }
 }
 
