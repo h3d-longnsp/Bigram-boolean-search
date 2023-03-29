@@ -1,31 +1,43 @@
 import javax.swing.{
-  JFrame,
-  WindowConstants,
-  JMenu,
-  JMenuBar,
-  JMenuItem,
-  JSeparator,
-  JFileChooser
+    JFrame,
+    WindowConstants,
+    JMenu,
+    JMenuBar,
+    JMenuItem,
+    JSeparator,
+    JFileChooser,
+    JScrollPane,
+    JButton,
+    JPanel,
+    BorderFactory,
+    ScrollPaneConstants,
+    UIManager,
+    JOptionPane,
+    JTextArea
 }
 import java.awt.event.ActionListener
 import java.awt.event.ActionEvent
 import javax.swing.filechooser.FileNameExtensionFilter
-import javax.swing.JTextArea
 import java.awt.BorderLayout
-import javax.swing.JScrollPane
-import javax.swing.JButton
-import javax.swing.JPanel
-import javax.swing.BorderFactory
-import javax.swing.ScrollPaneConstants
-import javax.swing.UIManager
+import javax.swing.ImageIcon
+import javax.swing.JDialog
+import javax.swing.JProgressBar
+import javax.swing.JLabel
 
 object GUI {
-  var index: Map[String, List[Int]] = Map.empty
-  var inputFolderPath = ""
-  var indexFilePath = ""
-  val vocabTextArea = new JTextArea()
-  val filePathTextArea = new JTextArea(1, 1)
-  val folderPathTextArea = new JTextArea(1, 1)
+    var index: Map[String, List[Int]] = Map.empty
+    var inputFolderPath = ""
+    var indexFilePath = ""
+    var combineVocabulary: List[String] = List.empty
+
+    val vocabTextArea = new JTextArea()
+    val filePathTextArea = new JTextArea(1, 1)
+    val folderPathTextArea = new JTextArea(1, 1)
+
+    val loadingDialog = new JDialog()
+
+    val loadingIcon = new ImageIcon("assets/loading.gif")
+    val errorIcon = new ImageIcon("assets/error.png")
 
   private def createWindow(): Unit = {
     val frame = new JFrame("Bigram Boolean Search")
@@ -46,6 +58,7 @@ object GUI {
     createPathsArea(panel)
     createVocabArea(panel)
     createButton(panel)
+    createLoadingFrame()
   }
 
   def createMenuBar(frame: JFrame): Unit = {
@@ -116,8 +129,16 @@ object GUI {
 
     buildVocabBtn.addActionListener(new ActionListener {
       override def actionPerformed(e: ActionEvent): Unit = {
-        val liststr = List("123", "asafa")
-        vocabTextArea.setText(liststr.mkString("\n"))
+        if (inputFolderPath == "") {
+            JOptionPane.showMessageDialog(null, "No input folder chosen!", "Error", JOptionPane.ERROR_MESSAGE, errorIcon);
+        }
+        else {    
+            loadingDialog.setVisible(true)
+            val (pairs, unigramVocab, bigramVocab) = Indexer.buildVocab(inputFolderPath)
+            combineVocabulary = unigramVocab ++ bigramVocab
+            vocabTextArea.setText(combineVocabulary.sorted.mkString("\n"))
+            loadingDialog.setVisible(false)
+        }
       }
     })
 
@@ -162,6 +183,13 @@ object GUI {
 
     panel.add(scrollPane1)
     panel.add(scrollPane2)
+  }
+
+  def createLoadingFrame() = {
+    loadingDialog.setTitle("Building...")
+    loadingDialog.setContentPane(new JLabel(loadingIcon))  
+    loadingDialog.setLocationRelativeTo(null)
+    loadingDialog.pack()   
   }
 
   def main(args: Array[String]) {
