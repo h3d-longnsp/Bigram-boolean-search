@@ -61,7 +61,8 @@ object GUI {
         fileMenuItem1.addActionListener(new ActionListener {
           override def actionPerformed(e: ActionEvent): Unit = {
             if (folderChooser.showOpenDialog(fileMenuItem1) == JFileChooser.APPROVE_OPTION) {
-              inputFolderPath = folderChooser.getSelectedFile().getPath()
+                inputFolderPath = folderChooser.getSelectedFile().getPath()
+                folderPathTextArea.setText(inputFolderPath)
             }
           }
         })
@@ -69,7 +70,8 @@ object GUI {
         fileMenuItem2.addActionListener(new ActionListener {
           override def actionPerformed(e: ActionEvent): Unit = {
             if (fileChooser.showOpenDialog(fileMenuItem1) == JFileChooser.APPROVE_OPTION) {
-              indexFilePath = fileChooser.getSelectedFile().getPath()
+                indexFilePath = fileChooser.getSelectedFile().getPath()
+                filePathTextArea.setText(indexFilePath)
             }
           }
         })
@@ -136,9 +138,6 @@ object GUI {
         val scrollPane2 = new JScrollPane(filePathTextArea)
         scrollPane2.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER)        
         filePathTextArea.setBorder(border2)
-
-        folderPathTextArea.setText("/home/lovell/classroom/afsfas/f")
-        filePathTextArea.setText("/home/lovell/classroom/afaf/awr3/afafs/inputreuter/12411.txt")
 
         scrollPane1.setBounds(30, 5, 325, 45)
         scrollPane2.setBounds(30, 60, 325, 45)
