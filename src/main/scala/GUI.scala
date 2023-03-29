@@ -31,6 +31,8 @@ object GUI {
     var combineVocabulary: List[String] = List.empty
 
     val vocabTextArea = new JTextArea()
+    val indexTextArea = new JTextArea()
+
     val filePathTextArea = new JTextArea(1, 1)
     val folderPathTextArea = new JTextArea(1, 1)
 
@@ -57,6 +59,7 @@ object GUI {
     createMenuBar(frame)
     createPathsArea(panel)
     createVocabArea(panel)
+    createIndexArea(panel)
     createButton(panel)
     createLoadingFrame()
   }
@@ -69,14 +72,14 @@ object GUI {
     val filter = new FileNameExtensionFilter("Index text file (*.txt)", "txt");
     fileChooser.setFileFilter(filter)
     fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY)
-    fileChooser.setDialogTitle("Choose an index file")
+    fileChooser.setDialogTitle("Select an index file")
 
     val folderChooser = new JFileChooser()
     folderChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-    folderChooser.setDialogTitle("Choose an input folder")
+    folderChooser.setDialogTitle("Select an input folder")
 
-    val fileMenuItem1 = new JMenuItem("Open input folder")
-    val fileMenuItem2 = new JMenuItem("Open index")
+    val fileMenuItem1 = new JMenuItem("Select input folder")
+    val fileMenuItem2 = new JMenuItem("Open index file")
     val fileMenuItem3 = new JMenuItem("Quit")
 
     fileMenuItem1.addActionListener(new ActionListener {
@@ -97,8 +100,12 @@ object GUI {
           fileChooser
             .showOpenDialog(fileMenuItem1) == JFileChooser.APPROVE_OPTION
         ) {
+          loadingDialog.setVisible(true)
           indexFilePath = fileChooser.getSelectedFile().getPath()
           filePathTextArea.setText(indexFilePath)
+          index = Indexer.sortIndex(Indexer.loadIndex(indexFilePath))
+          indexTextArea.setText(index.map { case (term, docIds) => term + "\t\t|\t" + docIds.mkString(" ") }.mkString("\n"))
+          loadingDialog.setVisible(false)
         }
       }
     })
@@ -157,6 +164,17 @@ object GUI {
     panel.add(scrollPane)
   }
 
+  def createIndexArea(panel: JPanel): Unit = {
+    indexTextArea.setEditable(false)
+    indexTextArea.setColumns(1)
+
+    val borderIndex = BorderFactory.createTitledBorder("Index")
+    val scrollPane = new JScrollPane(indexTextArea)
+    scrollPane.setBorder(borderIndex)
+    scrollPane.setBounds(225, 125, 750, 515)
+    panel.add(scrollPane)
+  }
+
   def createPathsArea(panel: JPanel): Unit = {
     UIManager.put("ScrollBar.width", 12);
 
@@ -185,7 +203,7 @@ object GUI {
   }
 
   def createLoadingFrame() = {
-    loadingDialog.setTitle("Building...")
+    loadingDialog.setTitle("Running...")
     loadingDialog.setResizable(false)
     loadingDialog.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE)
     loadingDialog.add(new JLabel(loadingIcon))  
