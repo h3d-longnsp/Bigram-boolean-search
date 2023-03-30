@@ -20,10 +20,13 @@ import java.awt.event.ActionEvent
 import javax.swing.filechooser.FileNameExtensionFilter
 import javax.swing.ImageIcon
 import javax.swing.JDialog
-import javax.swing.JProgressBar
 import javax.swing.JLabel
-import java.awt.Dialog.ModalityType
 import javax.swing.SwingWorker
+import java.awt.Color
+import javax.swing.SwingConstants
+import javax.swing.JComboBox
+import javax.swing.KeyStroke
+import java.awt.event.KeyEvent
 
 object GUI {
     var index: Map[String, List[Int]] = Map.empty
@@ -34,6 +37,15 @@ object GUI {
     val vocabTextArea = new JTextArea()
     val indexTextArea = new JTextArea()
 
+    var firstTermTxt = ""
+    var secondTermTxt = "" 
+    var queryTxt = ""
+    var searchResultTxt = ""  
+    val term1TxtArea = new JTextArea()
+    val term2TxtArea = new JTextArea()
+    val queryTxtArea = new JTextArea()
+    val searchResultTxtArea = new JTextArea()
+
     val filePathTextArea = new JTextArea(1, 1)
     val folderPathTextArea = new JTextArea(1, 1)
 
@@ -41,6 +53,7 @@ object GUI {
 
     val loadingIcon = new ImageIcon("assets/loading.gif")
     val errorIcon = new ImageIcon("assets/error.png")
+    val searchIcon = new ImageIcon("assets/search.png")
 
     val globalFrame = new JFrame("Bigram Boolean Search")
     val fileChooser = new JFileChooser()
@@ -190,7 +203,6 @@ object GUI {
 
   def createVocabArea(panel: JPanel): Unit = {
     vocabTextArea.setEditable(false)
-    vocabTextArea.setColumns(1)
 
     val borderVocab = BorderFactory.createTitledBorder("Vocabulary")
     val scrollPane = new JScrollPane(vocabTextArea)
@@ -237,10 +249,73 @@ object GUI {
   }
 
   def createSearchArea(panel: JPanel): Unit = {
+    // Create container panel
     val searchPanel = new JPanel()
     val searchBorder = BorderFactory.createTitledBorder("Search")
+    searchPanel.setLayout(null)
     searchPanel.setBorder(searchBorder)
     searchPanel.setBounds(25, 600, 975, 250)
+
+    // create first text area
+    term1TxtArea.getInputMap().put(KeyStroke.getKeyStroke("ENTER"), "none")
+    val termBorder1 = BorderFactory.createTitledBorder("Term A:")
+    val termScrollPane1 = new JScrollPane(term1TxtArea)    
+    termScrollPane1.setVerticalScrollBarPolicy(
+      ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER
+    )
+    termScrollPane1.setBorder(termBorder1)
+    termScrollPane1.setBounds(25, 35, 150, 50)
+
+    // create second text area
+    term2TxtArea.getInputMap().put(KeyStroke.getKeyStroke("ENTER"), "none")
+    val termBorder2 = BorderFactory.createTitledBorder("Term B:")
+    val termScrollPane2 = new JScrollPane(term2TxtArea)
+    termScrollPane2.setVerticalScrollBarPolicy(
+      ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER
+    )    
+    termScrollPane2.setBorder(termBorder2)
+    termScrollPane2.setBounds(200, 35, 150, 50)
+
+    // create option comboBox
+    val optionBorder = BorderFactory.createTitledBorder("Option:")
+    val optionComboBox = new JComboBox[String]
+    optionComboBox.setBorder(optionBorder)
+    optionComboBox.setBounds(400, 35, 200, 50)
+    val options = List("Search: A", "Search: A AND B", "Search: A OR B", "Search: A AND (NOT B)", "Search: A OR (NOT B)")
+    options.foreach(optionComboBox.addItem(_))
+
+    // create search button
+    val searchBtn = new JButton(searchIcon)
+    searchBtn.setText("Search!")
+    searchBtn.setToolTipText("Search the chosen query.")
+    searchBtn.setMnemonic(KeyEvent.VK_S)
+    searchBtn.setBounds(700, 35, 125, 50)    
+
+    // create query text area
+    val queryBorder = BorderFactory.createTitledBorder("Query:")
+    queryBorder.setTitleColor(Color.PINK)
+    queryTxtArea.setEditable(false)
+    val queryScrollPane = new JScrollPane(queryTxtArea)
+    queryScrollPane.setBorder(queryBorder)
+    queryScrollPane.setBounds(175, 100, 625, 50) 
+
+    // create result text area
+    val searchResultBorder = BorderFactory.createTitledBorder("Result:")
+    searchResultBorder.setTitleColor(Color.BLUE)
+    searchResultTxtArea.setEditable(false)
+    searchResultTxtArea.setLineWrap(true)
+    searchResultTxtArea.setWrapStyleWord(true)
+    val searchResultScrollPane = new JScrollPane(searchResultTxtArea)
+    searchResultScrollPane.setBorder(searchResultBorder)
+    searchResultScrollPane.setBounds(175, 160, 625, 80)    
+
+    // add elements to searchPanel container
+    searchPanel.add(termScrollPane1)
+    searchPanel.add(termScrollPane2)
+    searchPanel.add(optionComboBox)
+    searchPanel.add(searchBtn)
+    searchPanel.add(queryScrollPane)
+    searchPanel.add(searchResultScrollPane)
     panel.add(searchPanel)
   }
 
