@@ -80,22 +80,22 @@ object Indexer {
   }
 
   def writeOutputToFile(filename: String = "", index: Map[String, List[Int]]): Unit = {
-    val content = index.map { case (term, docIds) => term + ' ' + docIds.mkString(" ") }.mkString("\n")
+    val content = index.map { case (term, docIds) => term + ' ' + docIds.sorted.mkString(" ") }.mkString("\n")
     Files.writeString(Paths.get(filename), content)
   }
 
 
   def main(args: Array[String]): Unit = {
-    val (pairs, unigramVocabulary, bigramVocabulary) = buildVocab("input/test")
+    val (pairs, unigramVocabulary, bigramVocabulary) = buildVocab("input/reuters-test")
 
     val unigramIndex = buildUnigramIndex(pairs, unigramVocabulary)
-    val bigramIndex = buildBigramIndex(pairs, bigramVocabulary)
+    //val bigramIndex = buildBigramIndex(pairs, bigramVocabulary)
 
     val sortedUnigramIndex = sortIndex(unigramIndex)
-    val sortedBigramIndex = sortIndex(bigramIndex)
+    //val sortedBigramIndex = sortIndex(bigramIndex)
 
-    writeOutputToFile("output/index-unigram1.txt", sortedUnigramIndex)
-    writeOutputToFile("output/index-bigram1.txt", sortedBigramIndex)
+    writeOutputToFile("output/index.txt", sortedUnigramIndex)
+    //writeOutputToFile("output/index-bigram1.txt", sortedBigramIndex)
     println("done")
   }
 }
