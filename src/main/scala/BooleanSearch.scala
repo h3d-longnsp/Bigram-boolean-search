@@ -36,7 +36,7 @@ object BooleanSearch {
     val q1 = search(index, term1)
     val q2 = search(index, term2)
 
-    q1.diff(q2)
+    q1.diff(q2).sorted
   }
 
   /**

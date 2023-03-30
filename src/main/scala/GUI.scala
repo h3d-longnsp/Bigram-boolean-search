@@ -378,8 +378,18 @@ object GUI {
                       else {
                         optionSearchOr(globalIndex)
                       }
-            case 3 => println("option 4")
-            case 4 => println("option 5")
+            case 3 => if (term1TextArea.getText() == "" || term2TextArea.getText() == "") {
+                        JOptionPane.showMessageDialog(null, "A term/terms was empty!", "Error", JOptionPane.ERROR_MESSAGE, errorIcon)
+                      }
+                      else {
+                        optionSearchAndNot(globalIndex)
+                      }
+            case 4 => if (term1TextArea.getText() == "" || term2TextArea.getText() == "") {
+                        JOptionPane.showMessageDialog(null, "A term/terms was empty!", "Error", JOptionPane.ERROR_MESSAGE, errorIcon)
+                      }
+                      else {
+                        optionSearchOrNot(globalIndex)
+                      }
           }          
         }
       }
@@ -437,9 +447,10 @@ object GUI {
   }
 
   def optionSearch(index: Map[String, List[Int]]): Unit = {
+    firstTermTxt = term1TextArea.getText().stripLeading().stripTrailing()
+    searchResultTxt = BooleanSearch.search(index, firstTermTxt)    
+    term1TextArea.setText(firstTermTxt)
     term2TextArea.setText("")
-    firstTermTxt = term1TextArea.getText()
-    searchResultTxt = BooleanSearch.search(index, firstTermTxt)
     queryTextArea.setText(firstTermTxt)
     if (searchResultTxt.isEmpty) {
       searchResultTextArea.setText("Not found!")  
@@ -450,9 +461,11 @@ object GUI {
   }
 
   def optionSearchAnd(index: Map[String, List[Int]]): Unit = {
-    firstTermTxt = term1TextArea.getText()
-    secondTermTxt = term2TextArea.getText()
+    firstTermTxt = term1TextArea.getText().stripLeading().stripTrailing()
+    secondTermTxt = term2TextArea.getText().stripLeading().stripTrailing()
     searchResultTxt = BooleanSearch.searchAnd(index, firstTermTxt, secondTermTxt)
+    term1TextArea.setText(firstTermTxt)
+    term2TextArea.setText(secondTermTxt)    
     queryTextArea.setText(firstTermTxt + " AND " + secondTermTxt)
     if (searchResultTxt.isEmpty) {
       searchResultTextArea.setText("Not found!")  
@@ -463,9 +476,11 @@ object GUI {
   }  
 
   def optionSearchOr(index: Map[String, List[Int]]): Unit = {
-    firstTermTxt = term1TextArea.getText()
-    secondTermTxt = term2TextArea.getText()
+    firstTermTxt = term1TextArea.getText().stripLeading().stripTrailing()
+    secondTermTxt = term2TextArea.getText().stripLeading().stripTrailing()
     searchResultTxt = BooleanSearch.searchOr(index, firstTermTxt, secondTermTxt)
+    term1TextArea.setText(firstTermTxt)
+    term2TextArea.setText(secondTermTxt) 
     queryTextArea.setText(firstTermTxt + " OR " + secondTermTxt)
     if (searchResultTxt.isEmpty) {
       searchResultTextArea.setText("Not found!")  
@@ -474,6 +489,37 @@ object GUI {
       searchResultTextArea.setText(searchResultTxt.mkString(" "))
     }
   }  
+
+  def optionSearchAndNot(index: Map[String, List[Int]]): Unit = {
+    firstTermTxt = term1TextArea.getText().stripLeading().stripTrailing()
+    secondTermTxt = term2TextArea.getText().stripLeading().stripTrailing()
+    searchResultTxt = BooleanSearch.searchAndNot(index, firstTermTxt, secondTermTxt)
+    term1TextArea.setText(firstTermTxt)
+    term2TextArea.setText(secondTermTxt)
+    queryTextArea.setText(firstTermTxt + " AND (NOT " + secondTermTxt + ")")
+    if (searchResultTxt.isEmpty) {
+      searchResultTextArea.setText("Not found!")  
+    }
+    else {
+      searchResultTextArea.setText(searchResultTxt.mkString(" "))
+    }
+  }
+
+  def optionSearchOrNot(index: Map[String, List[Int]]): Unit = {
+    firstTermTxt = term1TextArea.getText().stripLeading().stripTrailing()
+    secondTermTxt = term2TextArea.getText().stripLeading().stripTrailing()
+    searchResultTxt = BooleanSearch.searchOrNot(index, firstTermTxt, secondTermTxt)
+    term1TextArea.setText(firstTermTxt)
+    term2TextArea.setText(secondTermTxt)
+    queryTextArea.setText(firstTermTxt + " OR (NOT " + secondTermTxt + ")")
+    if (searchResultTxt.isEmpty) {
+      searchResultTextArea.setText("Not found!")  
+    }
+    else {
+      searchResultTextArea.setText(searchResultTxt.mkString(" "))
+    }
+  }
+
   def createLoadingFrame() = {
     loadingDialog.setTitle("Running...")
     loadingDialog.setResizable(false)
