@@ -23,6 +23,8 @@ import javax.swing.ImageIcon
 import javax.swing.JDialog
 import javax.swing.JProgressBar
 import javax.swing.JLabel
+import java.awt.Dialog.ModalityType
+import javax.swing.SwingWorker
 
 object GUI {
     var index: Map[String, List[Int]] = Map.empty
@@ -40,6 +42,18 @@ object GUI {
 
     val loadingIcon = new ImageIcon("assets/loading.gif")
     val errorIcon = new ImageIcon("assets/error.png")
+
+  class buildVocabWorker extends SwingWorker[String, Object] {
+    override def doInBackground(): String = {
+      // Do the time-consuming task here
+      Thread.sleep(2000)
+      "In background thread"
+    }
+    override def done(): Unit = {
+      loadingDialog.setVisible(false)
+      println("Button clicked  " + get())
+    }
+  }
 
   private def createWindow(): Unit = {
     val frame = new JFrame("Bigram Boolean Search")
@@ -148,6 +162,40 @@ object GUI {
         }
       }
     })
+
+    // buildIndexBtn.addActionListener(new ActionListener {
+    //   override def actionPerformed(e: ActionEvent): Unit = {
+    //     if (combineVocabulary.isEmpty) {
+    //         JOptionPane.showMessageDialog(null, "No vocabulary built!", "Error", JOptionPane.ERROR_MESSAGE, errorIcon);
+    //     }
+    //     else {    
+    //         loadingDialog.setVisible(true)
+    //         println("build index....")
+    //         loadingDialog.setVisible(false)
+    //     }
+    //   }
+    // })    
+
+    // Create SwingWorker
+    // val worker = new SwingWorker[String, String]() {
+    //   override def doInBackground(): String = {
+    //     // Do the time-consuming task here
+    //     Thread.sleep(2000)
+    //     "In background thread"
+    //   }
+    //   override def done(): Unit = {
+    //     loadingDialog.setVisible(false)
+    //     println("Button clicked  " + get())
+    //   }
+    // }
+
+    buildIndexBtn.addActionListener(new ActionListener {
+      override def actionPerformed(e: ActionEvent): Unit = {
+        val worker = new buildVocabWorker
+        loadingDialog.setVisible(true)
+        worker.execute()
+      }
+    })    
 
     panel.add(buildVocabBtn)
     panel.add(buildIndexBtn)
