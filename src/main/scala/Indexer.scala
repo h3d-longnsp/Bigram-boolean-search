@@ -53,7 +53,7 @@ object Indexer {
   def buildUnigramIndex(pairs: List[(String, Seq[String])], unigramVocab: List[String]) = {
     val unigramIndex = unigramVocab.map { term =>
       val docIds = pairs.filter(pair => pair._2.contains(term)).map(_._1.toInt)
-      (term, docIds)
+      (term, docIds.sorted)
     }.toMap
 
     unigramIndex
@@ -69,7 +69,7 @@ object Indexer {
   def buildBigramIndex(pairs: List[(String, Seq[String])], bigramVocab: List[String]) = {
     val bigramIndex = bigramVocab.map { term =>
       val docIds = pairs.filter(pair => pair._2.sliding(2).toList.distinct.map(_.mkString(" ")).contains(term)).map(_._1.toInt)
-      (term, docIds)
+      (term, docIds.sorted)
     }.toMap
 
     bigramIndex

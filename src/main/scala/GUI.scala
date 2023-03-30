@@ -29,10 +29,14 @@ import javax.swing.KeyStroke
 import java.awt.event.KeyEvent
 
 object GUI {
-    var index: Map[String, List[Int]] = Map.empty
     var inputFolderPath = ""
     var indexFilePath = ""
+
+    var pairs: List[(String, Seq[String])] = List.empty
+    var unigramVocabulary: List[String] = List.empty
+    var bigramVocabulary: List[String] = List.empty
     var combineVocabulary: List[String] = List.empty
+    var index: Map[String, List[Int]] = Map.empty
 
     val vocabTextArea = new JTextArea()
     val indexTextArea = new JTextArea()
@@ -58,16 +62,21 @@ object GUI {
     val globalFrame = new JFrame("Bigram Boolean Search")
     val fileChooser = new JFileChooser()
 
-  class buildVocabWorker extends SwingWorker[String, Unit] {
-    override def doInBackground(): String = {
+  class buildVocabWorker extends SwingWorker[List[String], Unit] {
+    override def doInBackground(): List[String] = {
       // Do the time-consuming task here
-      Thread.sleep(5000)
-      "In background thread"
+      val (temp1, temp2, temp3) = Indexer.buildVocab(inputFolderPath)
+      pairs = temp1
+      unigramVocabulary = temp2
+      bigramVocabulary = temp3
+      val tempVocabulary = unigramVocabulary ++ bigramVocabulary
+      vocabTextArea.setText(tempVocabulary.sorted.mkString("\n"))
+      tempVocabulary
     }
     override def done(): Unit = {
       loadingDialog.setVisible(false)
       globalFrame.setEnabled(true)
-      println("Button clicked  " + get())
+      combineVocabulary = get()
     }
   }
   class loadIndexWorker extends SwingWorker[Unit, Unit] {
@@ -78,6 +87,22 @@ object GUI {
       indexTextArea.setText(index.map { case (term, docIds) => term + "\t\t|\t" + docIds.mkString(" ") }.mkString("\n"))
     }
     override def done(): Unit = {
+      loadingDialog.setVisible(false)
+      globalFrame.setEnabled(true)
+    }
+  }  
+
+  class buildIndexWorker extends SwingWorker[Map[String, List[Int]], Unit] {
+    override def doInBackground(): Map[String, List[Int]] = {
+      val unigramIndex = Indexer.buildUnigramIndex(pairs, unigramVocabulary)
+      val bigramIndex = Indexer.buildBigramIndex(pairs, bigramVocabulary)
+      val tempIndex = Indexer.sortIndex(unigramIndex ++ bigramIndex)
+      indexTextArea.setText(tempIndex.map { case (term, docIds) => term + "\t\t|\t" + docIds.mkString(" ") }.mkString("\n"))
+      tempIndex
+    }
+
+    override def done(): Unit = {
+      index = get()
       loadingDialog.setVisible(false)
       globalFrame.setEnabled(true)
     }
@@ -176,26 +201,30 @@ object GUI {
     buildVocabBtn.addActionListener(new ActionListener {
       override def actionPerformed(e: ActionEvent): Unit = {
         if (inputFolderPath == "") {
-            JOptionPane.showMessageDialog(null, "No input folder chosen!", "Error", JOptionPane.ERROR_MESSAGE, errorIcon);
+            JOptionPane.showMessageDialog(null, "No input folder selected!", "Error", JOptionPane.ERROR_MESSAGE, errorIcon);
         }
         else {    
-            loadingDialog.setVisible(true)
-            val (pairs, unigramVocab, bigramVocab) = Indexer.buildVocab(inputFolderPath)
-            combineVocabulary = unigramVocab ++ bigramVocab
-            vocabTextArea.setText(combineVocabulary.sorted.mkString("\n"))
-            loadingDialog.setVisible(false)
+          val worker = new buildVocabWorker
+          loadingDialog.setVisible(true)
+          globalFrame.setEnabled(false)
+          worker.execute()
         }
       }
     })
 
     buildIndexBtn.addActionListener(new ActionListener {
       override def actionPerformed(e: ActionEvent): Unit = {
-        val worker = new buildVocabWorker
-        globalFrame.setEnabled(false)
-        loadingDialog.setVisible(true)
-        worker.execute()
+        if (combineVocabulary.isEmpty) {
+            JOptionPane.showMessageDialog(null, "No vocabulary built!", "Error", JOptionPane.ERROR_MESSAGE, errorIcon);
+        }
+        else {    
+          val worker = new buildIndexWorker
+          loadingDialog.setVisible(true)
+          globalFrame.setEnabled(false)
+          worker.execute()
+        }
       }
-    })    
+    })   
 
     panel.add(buildVocabBtn)
     panel.add(buildIndexBtn)
@@ -287,9 +316,11 @@ object GUI {
     // create search button
     val searchBtn = new JButton(searchIcon)
     searchBtn.setText("Search!")
-    searchBtn.setToolTipText("Search the chosen query.")
+    searchBtn.setToolTipText("Search the selected query.")
     searchBtn.setMnemonic(KeyEvent.VK_S)
     searchBtn.setBounds(700, 35, 125, 50)    
+
+    // add actionListener to searchBtn
 
     // create query text area
     val queryBorder = BorderFactory.createTitledBorder("Query:")
