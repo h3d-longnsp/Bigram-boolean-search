@@ -22,7 +22,7 @@ object BooleanSearch {
     val q1 = search(index, term1)
     val q2 = search(index, term2)
 
-    q1.intersect(q2)
+    q1.intersect(q2).sorted
   }
 
   def searchOr(index: Map[String, List[Int]], term1: String, term2: String): List[Int] = {
