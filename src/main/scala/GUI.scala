@@ -43,30 +43,45 @@ object GUI {
     val loadingIcon = new ImageIcon("assets/loading.gif")
     val errorIcon = new ImageIcon("assets/error.png")
 
-  class buildVocabWorker extends SwingWorker[String, Object] {
+    val globalFrame = new JFrame("Bigram Boolean Search")
+    val fileChooser = new JFileChooser()
+
+  class buildVocabWorker extends SwingWorker[String, Unit] {
     override def doInBackground(): String = {
       // Do the time-consuming task here
-      Thread.sleep(2000)
+      Thread.sleep(5000)
       "In background thread"
     }
     override def done(): Unit = {
       loadingDialog.setVisible(false)
+      globalFrame.setEnabled(true)
       println("Button clicked  " + get())
     }
   }
+  class loadIndexWorker extends SwingWorker[Unit, Unit] {
+    override def doInBackground(): Unit = {
+      indexFilePath = fileChooser.getSelectedFile().getPath()
+      filePathTextArea.setText(indexFilePath)
+      index = Indexer.sortIndex(Indexer.loadIndex(indexFilePath))
+      indexTextArea.setText(index.map { case (term, docIds) => term + "\t\t|\t" + docIds.mkString(" ") }.mkString("\n"))
+    }
+    override def done(): Unit = {
+      loadingDialog.setVisible(false)
+      globalFrame.setEnabled(true)
+    }
+  }  
 
   private def createWindow(): Unit = {
-    val frame = new JFrame("Bigram Boolean Search")
     val panel = new JPanel();
     panel.setLayout(null)
     panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10))
-    frame.setSize(1050, 750)
-    frame.setResizable(false)
-    frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE)
-    createUI(frame, panel)
-    // frame.pack()
-    frame.add(panel)
-    frame.setVisible(true)
+    globalFrame.setSize(1050, 750)
+    globalFrame.setResizable(false)
+    globalFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE)
+    createUI(globalFrame, panel)
+    // globalFrame.pack()
+    globalFrame.add(panel)
+    globalFrame.setVisible(true)
   }
 
   private def createUI(frame: JFrame, panel: JPanel): Unit = {
@@ -82,7 +97,6 @@ object GUI {
     val fileMenu = new JMenu("File")
     val helpMenu = new JMenu("Help")
 
-    val fileChooser = new JFileChooser()
     val filter = new FileNameExtensionFilter("Index text file (*.txt)", "txt");
     fileChooser.setFileFilter(filter)
     fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY)
@@ -114,12 +128,10 @@ object GUI {
           fileChooser
             .showOpenDialog(fileMenuItem1) == JFileChooser.APPROVE_OPTION
         ) {
+          val worker = new loadIndexWorker
           loadingDialog.setVisible(true)
-          indexFilePath = fileChooser.getSelectedFile().getPath()
-          filePathTextArea.setText(indexFilePath)
-          index = Indexer.sortIndex(Indexer.loadIndex(indexFilePath))
-          indexTextArea.setText(index.map { case (term, docIds) => term + "\t\t|\t" + docIds.mkString(" ") }.mkString("\n"))
-          loadingDialog.setVisible(false)
+          globalFrame.setEnabled(false)
+          worker.execute()
         }
       }
     })
@@ -176,22 +188,10 @@ object GUI {
     //   }
     // })    
 
-    // Create SwingWorker
-    // val worker = new SwingWorker[String, String]() {
-    //   override def doInBackground(): String = {
-    //     // Do the time-consuming task here
-    //     Thread.sleep(2000)
-    //     "In background thread"
-    //   }
-    //   override def done(): Unit = {
-    //     loadingDialog.setVisible(false)
-    //     println("Button clicked  " + get())
-    //   }
-    // }
-
     buildIndexBtn.addActionListener(new ActionListener {
       override def actionPerformed(e: ActionEvent): Unit = {
         val worker = new buildVocabWorker
+        globalFrame.setEnabled(false)
         loadingDialog.setVisible(true)
         worker.execute()
       }
