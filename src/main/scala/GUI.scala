@@ -33,13 +33,13 @@ object GUI {
   var firstTermTxt = ""
   var secondTermTxt = ""
   var queryTxt = ""
-  var searchResultTxt = ""
+  var searchResultTxt: List[Int] = List.empty
 
   var pairs: List[(String, Seq[String])] = List.empty
   var unigramVocabulary: List[String] = List.empty
   var bigramVocabulary: List[String] = List.empty
   var combineVocabulary: List[String] = List.empty
-  var index: Map[String, List[Int]] = Map.empty
+  var globalIndex: Map[String, List[Int]] = Map.empty
 
   val vocabTextArea = new JTextArea()
   val indexTextArea = new JTextArea()
@@ -55,9 +55,12 @@ object GUI {
   val loadingDialog = new JDialog()
   val fileChooser = new JFileChooser()
 
+  val appIcon = new ImageIcon("assets/app512.png")
   val loadingIcon = new ImageIcon("assets/loading.gif")
-  val errorIcon = new ImageIcon("assets/error.png")
-  val searchIcon = new ImageIcon("assets/search.png")
+  val infoIcon = new ImageIcon("assets/info64.png")
+  val errorIcon = new ImageIcon("assets/error64.png")
+  val searchIcon = new ImageIcon("assets/search32.png")
+  val clearIcon = new ImageIcon("assets/bin32.png")
 
   val globalFrame = new JFrame("Bigram Boolean Search")
 
@@ -82,11 +85,11 @@ object GUI {
     override def doInBackground(): Unit = {
       indexFilePathTxt = fileChooser.getSelectedFile().getPath()
       filePathTextArea.setText(indexFilePathTxt)
-      index = Indexer.sortIndex(Indexer.loadIndex(indexFilePathTxt))
+      globalIndex = Indexer.sortIndex(Indexer.loadIndex(indexFilePathTxt))
       indexTextArea.setText(
-        index
+        globalIndex
           .map { case (term, docIds) =>
-            term + "\t\t|\t" + docIds.mkString(" ")
+            term + "\t\t|\t" + docIds.sorted.mkString(" ")
           }
           .mkString("\n")
       )
@@ -113,7 +116,7 @@ object GUI {
     }
 
     override def done(): Unit = {
-      index = get()
+      globalIndex = get()
       loadingDialog.setVisible(false)
       globalFrame.setEnabled(true)
     }
@@ -129,6 +132,7 @@ object GUI {
     createUI(globalFrame, panel)
     // globalFrame.pack()
     globalFrame.add(panel)
+    globalFrame.setIconImage(appIcon.getImage())
     globalFrame.setVisible(true)
   }
 
@@ -330,7 +334,7 @@ object GUI {
     val optionBorder = BorderFactory.createTitledBorder("Option:")
     val optionComboBox = new JComboBox[String]
     optionComboBox.setBorder(optionBorder)
-    optionComboBox.setBounds(400, 35, 200, 50)
+    optionComboBox.setBounds(375, 35, 200, 50)
     val options = List(
       "Search: A",
       "Search: A AND B",
@@ -345,9 +349,53 @@ object GUI {
     searchBtn.setText("Search!")
     searchBtn.setToolTipText("Search the selected query.")
     searchBtn.setMnemonic(KeyEvent.VK_S)
-    searchBtn.setBounds(700, 35, 125, 50)
+    searchBtn.setBounds(600, 35, 125, 50)
 
     // add actionListener to searchBtn
+    searchBtn.addActionListener(new ActionListener {
+      override def actionPerformed(e: ActionEvent): Unit = {
+        if (globalIndex.isEmpty) {
+          JOptionPane.showMessageDialog(null, "No index built!", "Error", JOptionPane.ERROR_MESSAGE, errorIcon)
+        }
+        else {
+          val optionSelected = optionComboBox.getSelectedIndex()
+          optionSelected match {
+            case 0 => if (term1TextArea.getText() == "") {
+                        JOptionPane.showMessageDialog(null, "Term A was empty!", "Error", JOptionPane.ERROR_MESSAGE, errorIcon)
+                      }
+                      else {
+                        optionSearch(globalIndex)
+                      }
+            case 1 => println("option 2")
+            case 2 => println("option 3")
+            case 3 => println("option 4")
+            case 4 => println("option 5")
+          }          
+        }
+      }
+    })
+    
+    // create clear text fields button
+    val clearBtn = new JButton(clearIcon)
+    clearBtn.setText("Clear")
+    clearBtn.setToolTipText("Clear all the text fields in search panel.")
+    clearBtn.setMnemonic(KeyEvent.VK_C)
+    clearBtn.setBounds(750, 35, 125, 50)
+
+    // add actionListener to clearBtn
+    clearBtn.addActionListener(new ActionListener {
+      override def actionPerformed(e: ActionEvent): Unit = {
+        term1TextArea.setText("")
+        firstTermTxt = ""
+        term2TextArea.setText("")
+        secondTermTxt = ""
+        queryTextArea.setText("")
+        queryTxt = ""
+        searchResultTextArea.setText("")
+        searchResultTxt = List.empty
+        JOptionPane.showMessageDialog(null, "Search fields cleared!", "Message", JOptionPane.INFORMATION_MESSAGE, infoIcon)        
+      }
+    })
 
     // create query text area
     val queryBorder = BorderFactory.createTitledBorder("Query:")
@@ -372,9 +420,23 @@ object GUI {
     searchPanel.add(termScrollPane2)
     searchPanel.add(optionComboBox)
     searchPanel.add(searchBtn)
+    searchPanel.add(clearBtn)
     searchPanel.add(queryScrollPane)
     searchPanel.add(searchResultScrollPane)
     panel.add(searchPanel)
+  }
+
+  def optionSearch(index: Map[String, List[Int]]): Unit = {
+    term2TextArea.setText("")
+    firstTermTxt = term1TextArea.getText()
+    searchResultTxt = BooleanSearch.search(index, firstTermTxt)
+    queryTextArea.setText(firstTermTxt)
+    if (searchResultTxt.isEmpty) {
+      searchResultTextArea.setText("Not found!")  
+    }
+    else {
+      searchResultTextArea.setText(searchResultTxt.mkString(" "))
+    }
   }
 
   def createLoadingFrame() = {

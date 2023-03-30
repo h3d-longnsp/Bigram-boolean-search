@@ -6,8 +6,8 @@ object BooleanSearch {
    * @param term a term to search for
    * @return a list of docIds
    */
-  private def search(index: Map[String, List[Int]], term: String): List[Int] = {
-    index.getOrElse(term, List.empty)
+  def search(index: Map[String, List[Int]], term: String): List[Int] = {
+    index.getOrElse(term, List.empty).sorted
   }
 
   /**
@@ -18,21 +18,21 @@ object BooleanSearch {
    * @param term2
    * @return
    */
-  private def searchAnd(index: Map[String, List[Int]], term1: String, term2: String): List[Int] = {
+  def searchAnd(index: Map[String, List[Int]], term1: String, term2: String): List[Int] = {
     val q1 = search(index, term1)
     val q2 = search(index, term2)
 
     q1.intersect(q2)
   }
 
-  private def searchOr(index: Map[String, List[Int]], term1: String, term2: String): List[Int] = {
+  def searchOr(index: Map[String, List[Int]], term1: String, term2: String): List[Int] = {
     val q1 = search(index, term1)
     val q2 = search(index, term2)
 
     (q1 ++ q2).distinct.sorted
   }
 
-  private def searchAndNot(index: Map[String, List[Int]], term1: String, term2: String): List[Int] = {
+  def searchAndNot(index: Map[String, List[Int]], term1: String, term2: String): List[Int] = {
     val q1 = search(index, term1)
     val q2 = search(index, term2)
 
@@ -47,7 +47,7 @@ object BooleanSearch {
     * @param term2
     * @return
     */
-  private def searchOrNot(index: Map[String, List[Int]], term1: String, term2: String): List[Int] = {
+  def searchOrNot(index: Map[String, List[Int]], term1: String, term2: String): List[Int] = {
     val q1 = search(index, term1)
     val q2 = search(index, term2)
     val a = index.values.flatten.toSet.toList
