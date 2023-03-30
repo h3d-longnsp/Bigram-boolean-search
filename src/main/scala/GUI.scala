@@ -372,7 +372,12 @@ object GUI {
                       else {
                         optionSearchAnd(globalIndex)
                       }
-            case 2 => println("option 3")
+            case 2 => if (term1TextArea.getText() == "" || term2TextArea.getText() == "") {
+                        JOptionPane.showMessageDialog(null, "A term/terms was empty!", "Error", JOptionPane.ERROR_MESSAGE, errorIcon)
+                      }
+                      else {
+                        optionSearchOr(globalIndex)
+                      }
             case 3 => println("option 4")
             case 4 => println("option 5")
           }          
@@ -457,6 +462,18 @@ object GUI {
     }
   }  
 
+  def optionSearchOr(index: Map[String, List[Int]]): Unit = {
+    firstTermTxt = term1TextArea.getText()
+    secondTermTxt = term2TextArea.getText()
+    searchResultTxt = BooleanSearch.searchOr(index, firstTermTxt, secondTermTxt)
+    queryTextArea.setText(firstTermTxt + " OR " + secondTermTxt)
+    if (searchResultTxt.isEmpty) {
+      searchResultTextArea.setText("Not found!")  
+    }
+    else {
+      searchResultTextArea.setText(searchResultTxt.mkString(" "))
+    }
+  }  
   def createLoadingFrame() = {
     loadingDialog.setTitle("Running...")
     loadingDialog.setResizable(false)
