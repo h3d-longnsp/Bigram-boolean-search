@@ -18,7 +18,6 @@ import javax.swing.{
 import java.awt.event.ActionListener
 import java.awt.event.ActionEvent
 import javax.swing.filechooser.FileNameExtensionFilter
-import java.awt.BorderLayout
 import javax.swing.ImageIcon
 import javax.swing.JDialog
 import javax.swing.JProgressBar
@@ -75,7 +74,7 @@ object GUI {
     val panel = new JPanel();
     panel.setLayout(null)
     panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10))
-    globalFrame.setSize(1050, 750)
+    globalFrame.setSize(1025, 925)
     globalFrame.setResizable(false)
     globalFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE)
     createUI(globalFrame, panel)
@@ -87,9 +86,10 @@ object GUI {
   private def createUI(frame: JFrame, panel: JPanel): Unit = {
     createMenuBar(frame)
     createPathsArea(panel)
+    createButton(panel)
     createVocabArea(panel)
     createIndexArea(panel)
-    createButton(panel)
+    createSearchArea(panel)
     createLoadingFrame()
   }
 
@@ -155,10 +155,10 @@ object GUI {
 
   def createButton(panel: JPanel): Unit = {
     val buildVocabBtn = new JButton("Build Vocab")
-    buildVocabBtn.setBounds(30, 650, 150, 25)
+    buildVocabBtn.setBounds(475, 27, 125, 25)
 
     val buildIndexBtn = new JButton("Build Index")
-    buildIndexBtn.setBounds(200, 650, 150, 25)
+    buildIndexBtn.setBounds(475, 66, 125, 25)
 
     buildVocabBtn.addActionListener(new ActionListener {
       override def actionPerformed(e: ActionEvent): Unit = {
@@ -174,19 +174,6 @@ object GUI {
         }
       }
     })
-
-    // buildIndexBtn.addActionListener(new ActionListener {
-    //   override def actionPerformed(e: ActionEvent): Unit = {
-    //     if (combineVocabulary.isEmpty) {
-    //         JOptionPane.showMessageDialog(null, "No vocabulary built!", "Error", JOptionPane.ERROR_MESSAGE, errorIcon);
-    //     }
-    //     else {    
-    //         loadingDialog.setVisible(true)
-    //         println("build index....")
-    //         loadingDialog.setVisible(false)
-    //     }
-    //   }
-    // })    
 
     buildIndexBtn.addActionListener(new ActionListener {
       override def actionPerformed(e: ActionEvent): Unit = {
@@ -208,18 +195,17 @@ object GUI {
     val borderVocab = BorderFactory.createTitledBorder("Vocabulary")
     val scrollPane = new JScrollPane(vocabTextArea)
     scrollPane.setBorder(borderVocab)
-    scrollPane.setBounds(30, 125, 150, 515)
+    scrollPane.setBounds(25, 125, 175, 450)
     panel.add(scrollPane)
   }
 
   def createIndexArea(panel: JPanel): Unit = {
     indexTextArea.setEditable(false)
-    indexTextArea.setColumns(1)
 
     val borderIndex = BorderFactory.createTitledBorder("Index")
     val scrollPane = new JScrollPane(indexTextArea)
     scrollPane.setBorder(borderIndex)
-    scrollPane.setBounds(225, 125, 750, 515)
+    scrollPane.setBounds(250, 125, 750, 450)
     panel.add(scrollPane)
   }
 
@@ -243,11 +229,19 @@ object GUI {
 
     scrollPane1.setBorder(border1)
     scrollPane2.setBorder(border2)
-    scrollPane1.setBounds(30, 5, 325, 50)
-    scrollPane2.setBounds(30, 60, 325, 50)
+    scrollPane1.setBounds(25, 5, 325, 50)
+    scrollPane2.setBounds(25, 60, 325, 50)
 
     panel.add(scrollPane1)
     panel.add(scrollPane2)
+  }
+
+  def createSearchArea(panel: JPanel): Unit = {
+    val searchPanel = new JPanel()
+    val searchBorder = BorderFactory.createTitledBorder("Search")
+    searchPanel.setBorder(searchBorder)
+    searchPanel.setBounds(25, 600, 975, 250)
+    panel.add(searchPanel)
   }
 
   def createLoadingFrame() = {
