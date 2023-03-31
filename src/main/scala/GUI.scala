@@ -61,9 +61,18 @@ object GUI {
   val errorIcon = new ImageIcon("assets/error64.png")
   val searchIcon = new ImageIcon("assets/search32.png")
   val clearIcon = new ImageIcon("assets/bin32.png")
+  val saveIcon = new ImageIcon("assets/save32.png")
+  val checkIcon = new ImageIcon("assets/check32.png")
+  val uncheckIcon = new ImageIcon("assets/uncheck32.png")
+
+  val folderPathStatLabel = new JLabel(uncheckIcon)
+  val indexPathStatLabel = new JLabel(uncheckIcon)
 
   val globalFrame = new JFrame("Bigram Boolean Search")
 
+  def main(args: Array[String]) {
+    createWindow()
+  }
   class buildVocabWorker extends SwingWorker[List[String], Unit] {
     override def doInBackground(): List[String] = {
       // Do the time-consuming task here
@@ -76,11 +85,13 @@ object GUI {
       tempVocabulary
     }
     override def done(): Unit = {
-      loadingDialog.setVisible(false)
+      combineVocabulary = get()      
       globalFrame.setEnabled(true)
-      combineVocabulary = get()
+      loadingDialog.setVisible(false)
+      folderPathStatLabel.setIcon(checkIcon)
     }
   }
+
   class loadIndexWorker extends SwingWorker[Unit, Unit] {
     override def doInBackground(): Unit = {
       indexFilePathTxt = fileChooser.getSelectedFile().getPath()
@@ -95,8 +106,9 @@ object GUI {
       )
     }
     override def done(): Unit = {
-      loadingDialog.setVisible(false)
       globalFrame.setEnabled(true)
+      loadingDialog.setVisible(false)
+      indexPathStatLabel.setIcon(checkIcon)
     }
   }
 
@@ -117,8 +129,9 @@ object GUI {
 
     override def done(): Unit = {
       globalIndex = get()
-      loadingDialog.setVisible(false)
       globalFrame.setEnabled(true)
+      loadingDialog.setVisible(false)
+      indexPathStatLabel.setIcon(checkIcon)
     }
   }
 
@@ -126,11 +139,10 @@ object GUI {
     val panel = new JPanel();
     panel.setLayout(null)
     panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10))
-    globalFrame.setSize(1025, 925)
+    globalFrame.setSize(1100, 900)
     globalFrame.setResizable(false)
     globalFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE)
     createUI(globalFrame, panel)
-    // globalFrame.pack()
     globalFrame.add(panel)
     globalFrame.setIconImage(appIcon.getImage())
     globalFrame.setVisible(true)
@@ -148,6 +160,7 @@ object GUI {
 
   def createMenuBar(frame: JFrame): Unit = {
     val fileMenu = new JMenu("File")
+    fileMenu.setMnemonic(KeyEvent.VK_F)
     val helpMenu = new JMenu("Help")
 
     val filter = new FileNameExtensionFilter("Index text file (*.txt)", "txt");
@@ -159,9 +172,10 @@ object GUI {
     folderChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
     folderChooser.setDialogTitle("Select an input folder")
 
-    val fileMenuItem1 = new JMenuItem("Select input folder")
-    val fileMenuItem2 = new JMenuItem("Open index file")
-    val fileMenuItem3 = new JMenuItem("Quit")
+    val fileMenuItem1 = new JMenuItem("Select Input Folder")
+    val fileMenuItem2 = new JMenuItem("Load Index File")
+    val fileMenuItem3 = new JMenuItem("Close Program")
+    fileMenuItem3.setMnemonic(KeyEvent.VK_C)
 
     fileMenuItem1.addActionListener(new ActionListener {
       override def actionPerformed(e: ActionEvent): Unit = {
@@ -224,21 +238,26 @@ object GUI {
       ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER
     )
 
+    folderPathStatLabel.setBounds(450, 25, 35, 35)
+    indexPathStatLabel.setBounds(450, 90, 35, 35)
+
     scrollPane1.setBorder(border1)
     scrollPane2.setBorder(border2)
-    scrollPane1.setBounds(25, 5, 325, 50)
-    scrollPane2.setBounds(25, 60, 325, 50)
+    scrollPane1.setBounds(25, 15, 400, 50)
+    scrollPane2.setBounds(25, 80, 400, 50)
 
     panel.add(scrollPane1)
     panel.add(scrollPane2)
+    panel.add(folderPathStatLabel)
+    panel.add(indexPathStatLabel)
   }
   
   def createButton(panel: JPanel): Unit = {
     val buildVocabBtn = new JButton("Build Vocab")
-    buildVocabBtn.setBounds(475, 27, 125, 25)
+    buildVocabBtn.setBounds(700, 15, 125, 45)
 
     val buildIndexBtn = new JButton("Build Index")
-    buildIndexBtn.setBounds(475, 66, 125, 25)
+    buildIndexBtn.setBounds(700, 80, 125, 45)
 
     buildVocabBtn.addActionListener(new ActionListener {
       override def actionPerformed(e: ActionEvent): Unit = {
@@ -285,20 +304,22 @@ object GUI {
   def createVocabArea(panel: JPanel): Unit = {
     vocabTextArea.setEditable(false)
 
-    val borderVocab = BorderFactory.createTitledBorder("Vocabulary")
+    val vocabBorder = BorderFactory.createTitledBorder("Vocabulary")
+    vocabBorder.setTitleColor(Color.MAGENTA)
     val scrollPane = new JScrollPane(vocabTextArea)
-    scrollPane.setBorder(borderVocab)
-    scrollPane.setBounds(25, 125, 175, 450)
+    scrollPane.setBorder(vocabBorder)
+    scrollPane.setBounds(25, 435, 175, 385)
     panel.add(scrollPane)
   }
 
   def createIndexArea(panel: JPanel): Unit = {
     indexTextArea.setEditable(false)
 
-    val borderIndex = BorderFactory.createTitledBorder("Index")
+    val indexBorder = BorderFactory.createTitledBorder("Index")
+    indexBorder.setTitleColor(Color.MAGENTA)
     val scrollPane = new JScrollPane(indexTextArea)
-    scrollPane.setBorder(borderIndex)
-    scrollPane.setBounds(250, 125, 750, 450)
+    scrollPane.setBorder(indexBorder)
+    scrollPane.setBounds(250, 435, 825, 385)
     panel.add(scrollPane)
   }
 
@@ -308,7 +329,7 @@ object GUI {
     val searchBorder = BorderFactory.createTitledBorder("Search")
     searchPanel.setLayout(null)
     searchPanel.setBorder(searchBorder)
-    searchPanel.setBounds(25, 600, 975, 250)
+    searchPanel.setBounds(25, 155, 1050, 250)
 
     // create first text area
     term1TextArea.getInputMap().put(KeyStroke.getKeyStroke("ENTER"), "none")
@@ -318,7 +339,7 @@ object GUI {
       ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER
     )
     termScrollPane1.setBorder(termBorder1)
-    termScrollPane1.setBounds(25, 35, 150, 50)
+    termScrollPane1.setBounds(25, 35, 225, 50)
 
     // create second text area
     term2TextArea.getInputMap().put(KeyStroke.getKeyStroke("ENTER"), "none")
@@ -328,13 +349,13 @@ object GUI {
       ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER
     )
     termScrollPane2.setBorder(termBorder2)
-    termScrollPane2.setBounds(200, 35, 150, 50)
+    termScrollPane2.setBounds(275, 35, 225, 50)
 
     // create option comboBox
     val optionBorder = BorderFactory.createTitledBorder("Option:")
     val optionComboBox = new JComboBox[String]
     optionComboBox.setBorder(optionBorder)
-    optionComboBox.setBounds(375, 35, 200, 50)
+    optionComboBox.setBounds(575, 35, 225, 50)
     val options = List(
       "Search: A",
       "Search: A AND B",
@@ -349,7 +370,7 @@ object GUI {
     searchBtn.setText("Search!")
     searchBtn.setToolTipText("Search the selected query.")
     searchBtn.setMnemonic(KeyEvent.VK_S)
-    searchBtn.setBounds(600, 35, 125, 50)
+    searchBtn.setBounds(900, 35, 125, 50)
 
     // add actionListener to searchBtn
     searchBtn.addActionListener(new ActionListener {
@@ -400,7 +421,7 @@ object GUI {
     clearBtn.setText("Clear")
     clearBtn.setToolTipText("Clear all the text fields in search panel.")
     clearBtn.setMnemonic(KeyEvent.VK_C)
-    clearBtn.setBounds(750, 35, 125, 50)
+    clearBtn.setBounds(900, 185, 125, 50)
 
     // add actionListener to clearBtn
     clearBtn.addActionListener(new ActionListener {
@@ -423,7 +444,7 @@ object GUI {
     queryTextArea.setEditable(false)
     val queryScrollPane = new JScrollPane(queryTextArea)
     queryScrollPane.setBorder(queryBorder)
-    queryScrollPane.setBounds(175, 100, 625, 50)
+    queryScrollPane.setBounds(25, 100, 775, 50)
 
     // create result text area
     val searchResultBorder = BorderFactory.createTitledBorder("Result:")
@@ -433,7 +454,7 @@ object GUI {
     searchResultTextArea.setWrapStyleWord(true)
     val searchResultScrollPane = new JScrollPane(searchResultTextArea)
     searchResultScrollPane.setBorder(searchResultBorder)
-    searchResultScrollPane.setBounds(175, 160, 625, 80)
+    searchResultScrollPane.setBounds(25, 160, 775, 75)
 
     // add elements to searchPanel container
     searchPanel.add(termScrollPane1)
@@ -527,9 +548,5 @@ object GUI {
     loadingDialog.add(new JLabel(loadingIcon))
     loadingDialog.setLocationRelativeTo(null)
     loadingDialog.pack()
-  }
-
-  def main(args: Array[String]) {
-    createWindow()
   }
 }
