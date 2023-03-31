@@ -65,6 +65,7 @@ object GUI {
   val saveIcon = new ImageIcon("assets/save32.png")
   val checkIcon = new ImageIcon("assets/check32.png")
   val uncheckIcon = new ImageIcon("assets/uncheck32.png")
+  val catIcon = new ImageIcon("assets/cat128.png")
 
   val folderPathStatLabel = new JLabel(uncheckIcon)
   val indexPathStatLabel = new JLabel(uncheckIcon)
@@ -163,7 +164,8 @@ object GUI {
     val fileMenu = new JMenu("File")
     fileMenu.setMnemonic(KeyEvent.VK_F)
     val helpMenu = new JMenu("Help")
-
+    helpMenu.setMnemonic(KeyEvent.VK_H)
+    
     val filter = new FileNameExtensionFilter("Index text file (*.txt)", "txt");
     fileChooser.setFileFilter(filter)
     fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY)
@@ -176,7 +178,12 @@ object GUI {
     val fileMenuItem1 = new JMenuItem("Select Input Folder")
     val fileMenuItem2 = new JMenuItem("Load Index File")
     val fileMenuItem3 = new JMenuItem("Close Program")
-    fileMenuItem3.setMnemonic(KeyEvent.VK_C)
+    fileMenuItem1.setMnemonic(KeyEvent.VK_O)
+    fileMenuItem2.setMnemonic(KeyEvent.VK_L)
+    fileMenuItem3.setMnemonic(KeyEvent.VK_P)
+
+    val helpMenuItem1 = new JMenuItem("About")
+    helpMenuItem1.setMnemonic(KeyEvent.VK_A)
 
     fileMenuItem1.addActionListener(new ActionListener {
       override def actionPerformed(e: ActionEvent): Unit = {
@@ -214,6 +221,8 @@ object GUI {
     fileMenu.add(fileMenuItem2)
     fileMenu.add(new JSeparator()); // SEPARATOR
     fileMenu.add(fileMenuItem3)
+
+    helpMenu.add(helpMenuItem1)
 
     val menuBar = new JMenuBar
     menuBar.add(fileMenu)
@@ -255,10 +264,15 @@ object GUI {
   
   def createButton(panel: JPanel): Unit = {
     val buildVocabBtn = new JButton("Build Vocab")
+    buildVocabBtn.setMnemonic(KeyEvent.VK_V)
     buildVocabBtn.setBounds(700, 15, 125, 45)
 
     val buildIndexBtn = new JButton("Build Index")
+    buildIndexBtn.setMnemonic(KeyEvent.VK_B)
     buildIndexBtn.setBounds(700, 80, 125, 45)
+
+    val inAppIconLabel = new JLabel(catIcon)
+    inAppIconLabel.setBounds(925, 10, 128, 128)
 
     buildVocabBtn.addActionListener(new ActionListener {
       override def actionPerformed(e: ActionEvent): Unit = {
@@ -300,6 +314,7 @@ object GUI {
 
     panel.add(buildVocabBtn)
     panel.add(buildIndexBtn)
+    panel.add(inAppIconLabel)
   }
 
   def createVocabArea(panel: JPanel): Unit = {
