@@ -223,6 +223,12 @@ object GUI {
       }
     })
 
+    helpMenuItem1.addActionListener(new ActionListener {
+      override def actionPerformed(e: ActionEvent): Unit = {
+        JOptionPane.showMessageDialog(null, "Long Nguyen\n01/04/2023", "About", JOptionPane.INFORMATION_MESSAGE, infoIcon) 
+      }
+    })
+
     fileMenu.add(fileMenuItem1)
     fileMenu.add(fileMenuItem2)
     fileMenu.add(new JSeparator()); // SEPARATOR
