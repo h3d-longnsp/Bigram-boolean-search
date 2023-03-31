@@ -61,6 +61,7 @@ object GUI {
 
   val appIcon = new ImageIcon("assets/app512.png")
   val loadingIcon = new ImageIcon("assets/loading.gif")
+  val aboutIcon = new ImageIcon("assets/about64.png")
   val infoIcon = new ImageIcon("assets/info64.png")
   val errorIcon = new ImageIcon("assets/error64.png")
   val searchIcon = new ImageIcon("assets/search32.png")
@@ -225,7 +226,7 @@ object GUI {
 
     helpMenuItem1.addActionListener(new ActionListener {
       override def actionPerformed(e: ActionEvent): Unit = {
-        JOptionPane.showMessageDialog(null, "Long Nguyen\n01/04/2023", "About", JOptionPane.INFORMATION_MESSAGE, infoIcon) 
+        JOptionPane.showMessageDialog(null, "Bigram Boolean Search\nAuthor: Long Nguyen\n01/04/2023", "About", JOptionPane.INFORMATION_MESSAGE, aboutIcon) 
       }
     })
 
