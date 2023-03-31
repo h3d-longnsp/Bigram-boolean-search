@@ -2,7 +2,6 @@ import scala.io.Source
 import java.nio.file.Paths
 import java.nio.file.Files
 import scala.collection.JavaConverters._
-import scala.collection.immutable.ListMap
 import java.util.stream.Collectors.toList
 import org.tartarus.snowball.ext.englishStemmer
 
@@ -75,15 +74,10 @@ object Indexer {
     bigramIndex
   }
 
-  def sortIndex(index: Map[String, List[Int]]) = {
-    ListMap(index.toSeq.sortBy(_._1):_*)
-  }
-
   def writeOutputToFile(filename: String = "", index: Map[String, List[Int]]): Unit = {
     val content = index.map { case (term, docIds) => term + ' ' + docIds.sorted.mkString(" ") }.mkString("\n")
     Files.writeString(Paths.get(filename), content)
   }
-
 
   def main(args: Array[String]): Unit = {
     val (pairs, unigramVocabulary, bigramVocabulary) = buildVocab("input/reuters-test")
@@ -91,8 +85,8 @@ object Indexer {
     val unigramIndex = buildUnigramIndex(pairs, unigramVocabulary)
     //val bigramIndex = buildBigramIndex(pairs, bigramVocabulary)
 
-    val sortedUnigramIndex = sortIndex(unigramIndex)
-    //val sortedBigramIndex = sortIndex(bigramIndex)
+    val sortedUnigramIndex = Utils.sortIndex(unigramIndex)
+    //val sortedBigramIndex = Utils.sortIndex(bigramIndex)
 
     writeOutputToFile("output/index.txt", sortedUnigramIndex)
     //writeOutputToFile("output/index-bigram1.txt", sortedBigramIndex)

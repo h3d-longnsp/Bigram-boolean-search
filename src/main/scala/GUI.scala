@@ -98,7 +98,7 @@ object GUI {
     override def doInBackground(): Unit = {
       indexFilePathTxt = fileChooser.getSelectedFile().getPath()
       filePathTextArea.setText(indexFilePathTxt)
-      globalIndex = Indexer.sortIndex(Indexer.loadIndex(indexFilePathTxt))
+      globalIndex = Utils.sortIndex(Indexer.loadIndex(indexFilePathTxt))
       indexTextArea.setText(
         globalIndex
           .map { case (term, docIds) =>
@@ -118,7 +118,7 @@ object GUI {
     override def doInBackground(): Map[String, List[Int]] = {
       val unigramIndex = Indexer.buildUnigramIndex(pairs, unigramVocabulary)
       val bigramIndex = Indexer.buildBigramIndex(pairs, bigramVocabulary)
-      val tempIndex = Indexer.sortIndex(unigramIndex ++ bigramIndex)
+      val tempIndex = Utils.sortIndex(unigramIndex ++ bigramIndex)
       indexTextArea.setText(
         tempIndex
           .map { case (term, docIds) =>

@@ -83,7 +83,7 @@ object BooleanSearch {
     val unigramIndex = Indexer.loadIndex("output/index-unigram1.txt")
     val bigramIndex = Indexer.loadIndex("output/index-bigram1.txt")
 
-    val combineIndex = unigramIndex ++ bigramIndex
+    val combineIndex = Utils.mergeTwoIndex(unigramIndex, bigramIndex)
     println(search(combineIndex, "ago"))
     println(search(combineIndex, "the tokyo"))
   }
