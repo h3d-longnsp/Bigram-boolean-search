@@ -4,18 +4,9 @@ import java.nio.file.Files
 import scala.collection.JavaConverters._
 import java.util.stream.Collectors.toList
 import org.tartarus.snowball.ext.englishStemmer
+import scala.collection.parallel.CollectionConverters._
 
 object Indexer {
-  def loadIndex(indexPath: String): Map[String, List[Int]] = {
-    // Define a regex pattern to match the key and the list of integers
-    val regexIndex = "^(.+?)\\s+(\\d+.*)$".r    
-    val lines = Source.fromFile(indexPath, "UTF-8").getLines()
-    val index = lines.collect {
-      case regexIndex(key, values) => key -> values.split(" ").map(_.toInt).toList
-    }.toMap
-    index
-  }  
-
   private def stem(stemmer: englishStemmer, tokens: List[String]): Seq[String] = {
     tokens.map { token =>
       stemmer.setCurrent(token)
@@ -66,13 +57,29 @@ object Indexer {
     * @return
     */
   def buildBigramIndex(pairs: List[(String, Seq[String])], bigramVocab: List[String]) = {
-    val bigramIndex = bigramVocab.map { term =>
-      val docIds = pairs.filter(pair => pair._2.sliding(2).toList.distinct.map(_.mkString(" ")).contains(term)).map(_._1.toInt)
-      (term, docIds.sorted)
+    // Construct a map that maps each term to the set of document IDs that contain that term
+    val termToDocIds = pairs.flatMap { case (docId, sequence) =>
+      sequence.sliding(2).map(_.mkString(" ")).distinct.map(term => (term, docId.toInt))
+    }.groupBy(_._1).mapValues(_.map(_._2).toList.sorted)
+
+    // Use the pre-processed data to construct the bigram index
+    val bigramIndex = bigramVocab.par.map { term =>
+      val docIds = termToDocIds.getOrElse(term, Nil)
+      (term, docIds)
     }.toMap
 
-    bigramIndex
+    bigramIndex.seq
   }
+
+  def loadIndex(indexPath: String): Map[String, List[Int]] = {
+    // Define a regex pattern to match the key and the list of integers
+    val regexIndex = "^(.+?)\\s+(\\d+.*)$".r    
+    val lines = Source.fromFile(indexPath, "UTF-8").getLines()
+    val index = lines.collect {
+      case regexIndex(key, values) => key -> values.split(" ").map(_.toInt).toList
+    }.toMap
+    index
+  }    
 
   def writeOutputToFile(filename: String = "", index: Map[String, List[Int]]): Unit = {
     val content = index.map { case (term, docIds) => term + ' ' + docIds.sorted.mkString(" ") }.mkString("\n")
@@ -83,13 +90,13 @@ object Indexer {
     val (pairs, unigramVocabulary, bigramVocabulary) = buildVocab("input/reuters-test")
 
     val unigramIndex = buildUnigramIndex(pairs, unigramVocabulary)
-    //val bigramIndex = buildBigramIndex(pairs, bigramVocabulary)
+    val bigramIndex = buildBigramIndex(pairs, bigramVocabulary)
 
     val sortedUnigramIndex = Utils.sortIndex(unigramIndex)
-    //val sortedBigramIndex = Utils.sortIndex(bigramIndex)
+    val sortedBigramIndex = Utils.sortIndex(bigramIndex)
 
-    writeOutputToFile("output/index.txt", sortedUnigramIndex)
-    //writeOutputToFile("output/index-bigram1.txt", sortedBigramIndex)
+    writeOutputToFile("output/index-unigram2.txt", sortedUnigramIndex)
+    writeOutputToFile("output/index-bigram2.txt", sortedBigramIndex)
     println("done")
   }
 }
