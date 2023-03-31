@@ -56,6 +56,9 @@ object GUI {
   val fileChooser = new JFileChooser()
   val indexFileSaveChooser = new JFileChooser()
 
+  val vocabBorder = BorderFactory.createTitledBorder("Vocabulary: 0 row")
+  val indexBorder = BorderFactory.createTitledBorder("Index: 0 row")
+
   val appIcon = new ImageIcon("assets/app512.png")
   val loadingIcon = new ImageIcon("assets/loading.gif")
   val infoIcon = new ImageIcon("assets/info64.png")
@@ -84,6 +87,7 @@ object GUI {
       bigramVocabulary = temp3
       val tempVocabulary = unigramVocabulary ++ bigramVocabulary
       vocabTextArea.setText(tempVocabulary.sorted.mkString("\n"))
+      vocabBorder.setTitle("Vocabulary: " + vocabTextArea.getLineCount + " rows")      
       tempVocabulary
     }
     override def done(): Unit = {
@@ -106,6 +110,7 @@ object GUI {
           }
           .mkString("\n")
       )
+      indexBorder.setTitle("Vocabulary: " + indexTextArea.getLineCount + " rows")
     }
     override def done(): Unit = {
       globalFrame.setEnabled(true)
@@ -126,6 +131,7 @@ object GUI {
           }
           .mkString("\n")
       )
+      indexBorder.setTitle("Vocabulary: " + indexTextArea.getLineCount + " rows")
       tempIndex
     }
 
@@ -319,23 +325,19 @@ object GUI {
 
   def createVocabArea(panel: JPanel): Unit = {
     vocabTextArea.setEditable(false)
-
-    val vocabBorder = BorderFactory.createTitledBorder("Vocabulary")
     vocabBorder.setTitleColor(Color.MAGENTA)
     val scrollPane = new JScrollPane(vocabTextArea)
     scrollPane.setBorder(vocabBorder)
-    scrollPane.setBounds(25, 435, 175, 385)
+    scrollPane.setBounds(25, 435, 225, 385)
     panel.add(scrollPane)
   }
 
   def createIndexArea(panel: JPanel): Unit = {
     indexTextArea.setEditable(false)
-
-    val indexBorder = BorderFactory.createTitledBorder("Index")
     indexBorder.setTitleColor(Color.MAGENTA)
     val scrollPane = new JScrollPane(indexTextArea)
     scrollPane.setBorder(indexBorder)
-    scrollPane.setBounds(250, 435, 825, 385)
+    scrollPane.setBounds(300, 435, 775, 385)
     panel.add(scrollPane)
   }
 
