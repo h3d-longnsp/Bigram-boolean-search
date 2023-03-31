@@ -54,6 +54,7 @@ object GUI {
 
   val loadingDialog = new JDialog()
   val fileChooser = new JFileChooser()
+  val indexFileSaveChooser = new JFileChooser()
 
   val appIcon = new ImageIcon("assets/app512.png")
   val loadingIcon = new ImageIcon("assets/loading.gif")
@@ -181,7 +182,7 @@ object GUI {
       override def actionPerformed(e: ActionEvent): Unit = {
         if (
           folderChooser
-            .showOpenDialog(fileMenuItem1) == JFileChooser.APPROVE_OPTION
+            .showOpenDialog(null) == JFileChooser.APPROVE_OPTION
         ) {
           inputFolderPathTxt = folderChooser.getSelectedFile().getPath()
           folderPathTextArea.setText(inputFolderPathTxt)
@@ -193,7 +194,7 @@ object GUI {
       override def actionPerformed(e: ActionEvent): Unit = {
         if (
           fileChooser
-            .showOpenDialog(fileMenuItem1) == JFileChooser.APPROVE_OPTION
+            .showOpenDialog(null) == JFileChooser.APPROVE_OPTION
         ) {
           val worker = new loadIndexWorker
           loadingDialog.setVisible(true)
@@ -324,7 +325,7 @@ object GUI {
   }
 
   def createSearchArea(panel: JPanel): Unit = {
-    // Create container panel
+    // create container panel
     val searchPanel = new JPanel()
     val searchBorder = BorderFactory.createTitledBorder("Search")
     searchPanel.setLayout(null)
@@ -369,7 +370,7 @@ object GUI {
     val searchBtn = new JButton(searchIcon)
     searchBtn.setText("Search!")
     searchBtn.setToolTipText("Search the selected query.")
-    searchBtn.setMnemonic(KeyEvent.VK_S)
+    searchBtn.setMnemonic(KeyEvent.VK_E)
     searchBtn.setBounds(900, 35, 125, 50)
 
     // add actionListener to searchBtn
@@ -415,7 +416,36 @@ object GUI {
         }
       }
     })
-    
+
+    // create save button
+    val saveBtn = new JButton(saveIcon)
+    saveBtn.setText("Save")
+    saveBtn.setToolTipText("Save the result index.")
+    saveBtn.setMnemonic(KeyEvent.VK_S)
+    saveBtn.setBounds(900, 110, 125, 50)
+
+    // config indexFileSaveChooser
+    val filter = new FileNameExtensionFilter("Index text file (*.txt)", "txt");
+    indexFileSaveChooser.setFileFilter(filter)
+    indexFileSaveChooser.setFileSelectionMode(JFileChooser.FILES_ONLY)    
+    indexFileSaveChooser.setDialogTitle("Select a folder to save")
+
+    // add actionListener to saveBtn
+    saveBtn.addActionListener(new ActionListener {
+      override def actionPerformed(e: ActionEvent): Unit = {
+        if (globalIndex.isEmpty) {
+          JOptionPane.showMessageDialog(null, "No index built!", "Error", JOptionPane.ERROR_MESSAGE, errorIcon)
+        }
+        else {
+          if (indexFileSaveChooser.showSaveDialog(null) == JFileChooser.APPROVE_OPTION) {
+            val savePath = indexFileSaveChooser.getSelectedFile().getPath()
+            Indexer.writeOutputToFile(savePath, globalIndex)
+            JOptionPane.showMessageDialog(null, "Index saved to: " + savePath, "Message", JOptionPane.INFORMATION_MESSAGE, infoIcon) 
+          }
+        }       
+      }
+    })
+
     // create clear text fields button
     val clearBtn = new JButton(clearIcon)
     clearBtn.setText("Clear")
@@ -461,6 +491,7 @@ object GUI {
     searchPanel.add(termScrollPane2)
     searchPanel.add(optionComboBox)
     searchPanel.add(searchBtn)
+    searchPanel.add(saveBtn)
     searchPanel.add(clearBtn)
     searchPanel.add(queryScrollPane)
     searchPanel.add(searchResultScrollPane)
