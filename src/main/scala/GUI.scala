@@ -525,6 +525,7 @@ object GUI {
       searchResultTextArea.setText("Not found!")  
     }
     else {
+      queryTextArea.setText(firstTermTxt + "\t\t| " + searchResultTxt.length + " results")
       searchResultTextArea.setText(searchResultTxt.mkString(" "))
     }
   }
@@ -540,6 +541,7 @@ object GUI {
       searchResultTextArea.setText("Not found!")  
     }
     else {
+      queryTextArea.setText(firstTermTxt + " AND " + secondTermTxt + "\t\t| " + searchResultTxt.length + " results")
       searchResultTextArea.setText(searchResultTxt.mkString(" "))
     }
   }  
@@ -555,6 +557,7 @@ object GUI {
       searchResultTextArea.setText("Not found!")  
     }
     else {
+      queryTextArea.setText(firstTermTxt + " OR " + secondTermTxt + "\t\t| " + searchResultTxt.length + " results")
       searchResultTextArea.setText(searchResultTxt.mkString(" "))
     }
   }  
@@ -570,6 +573,7 @@ object GUI {
       searchResultTextArea.setText("Not found!")  
     }
     else {
+      queryTextArea.setText(firstTermTxt + " AND (NOT " + secondTermTxt + ")" + "\t\t| " + searchResultTxt.length + " results")
       searchResultTextArea.setText(searchResultTxt.mkString(" "))
     }
   }
@@ -585,6 +589,7 @@ object GUI {
       searchResultTextArea.setText("Not found!")  
     }
     else {
+      queryTextArea.setText(firstTermTxt + " OR (NOT " + secondTermTxt + ")" + "\t\t| " + searchResultTxt.length + " results")
       searchResultTextArea.setText(searchResultTxt.mkString(" "))
     }
   }
