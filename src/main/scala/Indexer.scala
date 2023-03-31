@@ -73,8 +73,9 @@ object Indexer {
 
   def loadIndex(indexPath: String): Map[String, List[Int]] = {
     // Define a regex pattern to match the key and the list of integers
-    val regexIndex = "^(.+?)\\s+(\\d+.*)$".r    
-    val lines = Source.fromFile(indexPath, "UTF-8").getLines()
+    val regexIndex = "^(.+?)\\s+(\\d+.*)$".r
+    // Wrap the Source.fromFile call in a BufferedSource to reduce the number of system calls made to read the file
+    val lines = Source.fromFile(indexPath, "UTF-8").getLines().buffered
     val index = lines.collect {
       case regexIndex(key, values) => key -> values.split(" ").map(_.toInt).toList
     }.toMap
