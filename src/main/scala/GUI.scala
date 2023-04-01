@@ -113,7 +113,7 @@ object GUI {
           }
           .mkString("\n")
       )
-      indexBorder.setTitle("Vocabulary: " + indexTextArea.getLineCount + " rows")
+      indexBorder.setTitle("Index: " + indexTextArea.getLineCount + " rows")
     }
     override def done(): Unit = {
       globalFrame.setEnabled(true)
@@ -134,7 +134,7 @@ object GUI {
           }
           .mkString("\n")
       )
-      indexBorder.setTitle("Vocabulary: " + indexTextArea.getLineCount + " rows")
+      indexBorder.setTitle("Index: " + indexTextArea.getLineCount + " rows")
       tempIndex
     }
 
