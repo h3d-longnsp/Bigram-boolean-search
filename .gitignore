@@ -5,5 +5,14 @@
 .bloop/
 .metals/
 .vscode/
-project/
-target/
+
+# sbt assembly
+project/*
+# include the plugin config
+!project/plugins.sbt
+
+target/*
+!target/scala-2.13
+target/scala-2.13/*
+# include the assembled jar file
+!target/scala-2.13/*.jar

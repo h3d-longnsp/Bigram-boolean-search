@@ -13,3 +13,4 @@ libraryDependencies ++= Seq(
 )
 
 mainClass in assembly := Some("org.long.A4.GUI")
+assemblyJarName in assembly := "boolean-search.jar"
