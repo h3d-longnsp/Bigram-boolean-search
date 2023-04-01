@@ -1,3 +1,5 @@
+package org.long.A4
+
 object BooleanSearch {
   /**
    * Search an index map for a term and return a list of results.

@@ -1,3 +1,5 @@
+package org.long.A4
+
 import scala.collection.immutable.ListMap
 
 object Utils {

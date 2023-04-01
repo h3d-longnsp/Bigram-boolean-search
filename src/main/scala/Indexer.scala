@@ -1,3 +1,5 @@
+package org.long.A4
+
 import scala.io.Source
 import java.nio.file.Paths
 import java.nio.file.Files
