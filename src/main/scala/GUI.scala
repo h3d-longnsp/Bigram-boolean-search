@@ -27,6 +27,8 @@ import javax.swing.SwingWorker
 import javax.swing.UIManager
 import javax.swing.WindowConstants
 import javax.swing.filechooser.FileNameExtensionFilter
+import javax.swing.event.DocumentListener
+import javax.swing.event.DocumentEvent
 
 object GUI {
   var inputFolderPathTxt = ""
@@ -109,7 +111,7 @@ object GUI {
       indexTextArea.setText(
         globalIndex
           .map { case (term, docIds) =>
-            term + "\t\t|\t" + docIds.sorted.mkString(" ")
+            term + "\t\t| " + docIds.sorted.mkString(" ")
           }
           .mkString("\n")
       )
@@ -130,7 +132,7 @@ object GUI {
       indexTextArea.setText(
         tempIndex
           .map { case (term, docIds) =>
-            term + "\t\t|\t" + docIds.mkString(" ")
+            term + "\t\t| " + docIds.mkString(" ")
           }
           .mkString("\n")
       )
@@ -334,10 +336,28 @@ object GUI {
 
   def createVocabArea(panel: JPanel): Unit = {
     vocabTextArea.setEditable(false)
+    vocabTextArea.setLineWrap(true)
     vocabBorder.setTitleColor(Color.MAGENTA)
     val scrollPane = new JScrollPane(vocabTextArea)
+
+    val vocabRowHeader = new JTextArea("0")
+    vocabRowHeader.setEditable(false)
+    scrollPane.setRowHeaderView(vocabRowHeader)
+
+    vocabTextArea.getDocument.addDocumentListener(new DocumentListener {
+      override def insertUpdate(e: DocumentEvent): Unit = updateRowHeader()
+      override def removeUpdate(e: DocumentEvent): Unit = updateRowHeader()
+      override def changedUpdate(e: DocumentEvent): Unit = updateRowHeader()
+      private def updateRowHeader(): Unit = {
+        val text = vocabTextArea.getText()
+        val numRows = text.count(_ == '\n') + 1
+        val rowHeaderText = (1 to numRows).mkString("\t|  \n")
+        vocabRowHeader.setText(rowHeaderText)
+      }
+    })    
+
     scrollPane.setBorder(vocabBorder)
-    scrollPane.setBounds(25, 435, 225, 385)
+    scrollPane.setBounds(25, 435, 300, 385)
     panel.add(scrollPane)
   }
 
@@ -345,8 +365,25 @@ object GUI {
     indexTextArea.setEditable(false)
     indexBorder.setTitleColor(Color.MAGENTA)
     val scrollPane = new JScrollPane(indexTextArea)
+
+    val vocabRowHeader = new JTextArea("0")
+    vocabRowHeader.setEditable(false)
+    scrollPane.setRowHeaderView(vocabRowHeader)
+
+    indexTextArea.getDocument.addDocumentListener(new DocumentListener {
+      override def insertUpdate(e: DocumentEvent): Unit = updateRowHeader()
+      override def removeUpdate(e: DocumentEvent): Unit = updateRowHeader()
+      override def changedUpdate(e: DocumentEvent): Unit = updateRowHeader()
+      private def updateRowHeader(): Unit = {
+        val text = indexTextArea.getText()
+        val numRows = text.count(_ == '\n') + 1
+        val rowHeaderText = (1 to numRows).mkString("\t|  \n")
+        vocabRowHeader.setText(rowHeaderText)
+      }
+    })
+
     scrollPane.setBorder(indexBorder)
-    scrollPane.setBounds(300, 435, 775, 385)
+    scrollPane.setBounds(375, 435, 700, 385)
     panel.add(scrollPane)
   }
 
