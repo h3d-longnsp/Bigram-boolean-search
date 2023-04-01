@@ -6,8 +6,8 @@
 - Click the `Import build` prompt when open project or run `Metals: Import Build` manually in the command palette (`ctrl`+`shift`+`P`).
 
 ## Build and run
-- Build the executable `jar` file for this project by open a terminal at the root folder and run `sbt assembly`.
-- Or run the pre-built `boolean-search.jar` in `target/scala-2.13` by running `java -jar boolean-search.jar`.
+- Build the executable `jar` file for this project by open a terminal at the root folder and run `sbt clean assembly`.
+- Or run the pre-built `bigram-boolean-search.jar` in `target/scala-2.13` by running `java -jar bigram-boolean-search.jar`.
 
 ## Usage
 ### 1. Graphical interface

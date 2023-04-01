@@ -12,5 +12,5 @@ libraryDependencies ++= Seq(
   "org.scala-lang.modules" %% "scala-parallel-collections" % "1.0.4"
 )
 
-mainClass in assembly := Some("org.long.A4.GUI")
-assemblyJarName in assembly := "boolean-search.jar"
+assembly / mainClass := Some("org.long.A4.GUI")
+assembly / assemblyJarName := "bigram-boolean-search.jar"

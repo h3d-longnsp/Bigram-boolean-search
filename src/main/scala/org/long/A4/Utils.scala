@@ -6,8 +6,8 @@ object Utils {
     /**
       * Merge two index of type Map[String, List[Int]], then sort the result.
       *
-      * @param map1 First map to merge
-      * @param map2 Second map to merge
+      * @param index1 First map to merge
+      * @param index2 Second map to merge
       * @return A Map[String, List[Int]] which is the result of merging map1 and 
       * map2, sorted in ascending order.
       */
