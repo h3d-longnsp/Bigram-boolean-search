@@ -39,6 +39,7 @@ object GUI {
   var secondTermTxt = ""
   var queryTxt = ""
   var searchResultTxt: List[Int] = List.empty
+  var rankedSearchResult: Seq[(RankedSearch.Document, Double)] = Seq.empty
 
   var pairs: List[(String, Seq[String])] = List.empty
   var unigramVocabulary: List[String] = List.empty
@@ -404,7 +405,7 @@ object GUI {
       override def removeUpdate(e: DocumentEvent): Unit = updateRowHeader()
       override def changedUpdate(e: DocumentEvent): Unit = updateRowHeader()
       private def updateRowHeader(): Unit = {
-        val text = indexTextArea.getText()
+        val text = scoreTextArea.getText()
         val numRows = text.count(_ == '\n') + 1
         val rowHeaderText = (1 to numRows).mkString("\t|  \n")
         scoreRowHeader.setText(rowHeaderText)
@@ -539,7 +540,7 @@ object GUI {
                         JOptionPane.showMessageDialog(null, "Term A was empty!", "Error", JOptionPane.ERROR_MESSAGE, errorIcon)
                       }
                       else {
-                        optionSearchRanked()
+                        optionSearchRanked(pairs, globalIndex)
                       } 
           }          
         }
@@ -706,8 +707,25 @@ object GUI {
     }
   }
 
-  def optionSearchRanked(): Unit = {
-    println("Search result")
+  def optionSearchRanked(pairs: List[(String, Seq[String])], index: Map[String, List[Int]]): Unit = {
+    firstTermTxt = term1TextArea.getText().stripLeading().stripTrailing()
+    rankedSearchResult = RankedSearch.search(index, pairs, firstTermTxt)    
+    term1TextArea.setText(firstTermTxt)
+    queryTextArea.setText(firstTermTxt)
+    if (rankedSearchResult.isEmpty) {
+      searchResultTextArea.setText("Not found!")  
+    }
+    else {
+      scoreTextArea.setText(
+        rankedSearchResult
+          .map { case (doc, score) =>
+            doc.id + "\t| " + score
+          }
+          .mkString("\n")
+      ) 
+      queryTextArea.setText(firstTermTxt + "\t\t| " + rankedSearchResult.length + " results")
+      searchResultTextArea.setText(rankedSearchResult.map { case (doc, _) => doc.id }.mkString(" "))
+    }
   }
 
   def createLoadingFrame() = {

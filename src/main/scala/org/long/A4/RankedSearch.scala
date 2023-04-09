@@ -91,6 +91,13 @@ object RankedSearch {
       .take(numResults)
   }
 
+  def search(index: Map[String, List[Int]], pairs: List[(String, Seq[String])], query: String): Seq[(Document, Double)] = {
+    val documents = pairs.map { case (id, tokens) => Document(id, tokens) }
+    val results = RankedSearch.rankDocuments(query, documents, index, documents.length, 10)
+
+    results
+  }
+
   def main(args: Array[String]): Unit = {
     val (pairs, unigramVocabulary, bigramVocabulary) =
       Indexer.buildVocab("input/reuters-test")
