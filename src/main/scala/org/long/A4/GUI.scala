@@ -29,6 +29,7 @@ import javax.swing.WindowConstants
 import javax.swing.filechooser.FileNameExtensionFilter
 import javax.swing.event.DocumentListener
 import javax.swing.event.DocumentEvent
+import javax.swing.JTabbedPane
 
 object GUI {
   var inputFolderPathTxt = ""
@@ -47,6 +48,7 @@ object GUI {
 
   val vocabTextArea = new JTextArea()
   val indexTextArea = new JTextArea()
+  val scoreTextArea = new JTextArea()
 
   val term1TextArea = new JTextArea()
   val term2TextArea = new JTextArea()
@@ -62,6 +64,7 @@ object GUI {
 
   val vocabBorder = BorderFactory.createTitledBorder("Vocabulary: 0 row")
   val indexBorder = BorderFactory.createTitledBorder("Index: 0 row")
+  val scoreBorder = BorderFactory.createTitledBorder("Score: 0 row")
 
   val appIcon = new ImageIcon(getClass.getResource("/res/app512.png"))
   val loadingIcon = new ImageIcon(getClass.getResource("/res/loading.gif"))
@@ -74,6 +77,9 @@ object GUI {
   val checkIcon = new ImageIcon(getClass.getResource("/res/check32.png"))
   val uncheckIcon = new ImageIcon(getClass.getResource("/res/uncheck32.png"))
   val catIcon = new ImageIcon(getClass.getResource("/res/cat128.png"))
+  val vocabTabIcon = new ImageIcon(getClass.getResource("/res/vocabulary16.png"))
+  val indexTabIcon = new ImageIcon(getClass.getResource("/res/index16.png"))
+  val scoreTabIcon = new ImageIcon(getClass.getResource("/res/score16.png"))
 
   val folderPathStatLabel = new JLabel(uncheckIcon)
   val indexPathStatLabel = new JLabel(uncheckIcon)
@@ -165,9 +171,8 @@ object GUI {
     createMenuBar(frame)
     createPathsArea(panel)
     createButton(panel)
-    createVocabArea(panel)
-    createIndexArea(panel)
     createSearchArea(panel)
+    createOutputArea(panel)
     createLoadingFrame()
   }
 
@@ -334,7 +339,7 @@ object GUI {
     panel.add(inAppIconLabel)
   }
 
-  def createVocabArea(panel: JPanel): Unit = {
+  def createVocabArea(): JScrollPane = {
     vocabTextArea.setEditable(false)
     vocabTextArea.setLineWrap(true)
     vocabBorder.setTitleColor(Color.MAGENTA)
@@ -357,11 +362,10 @@ object GUI {
     })    
 
     scrollPane.setBorder(vocabBorder)
-    scrollPane.setBounds(25, 435, 300, 385)
-    panel.add(scrollPane)
+    scrollPane
   }
 
-  def createIndexArea(panel: JPanel): Unit = {
+  def createIndexArea(): JScrollPane = {
     indexTextArea.setEditable(false)
     indexBorder.setTitleColor(Color.MAGENTA)
     val scrollPane = new JScrollPane(indexTextArea)
@@ -383,8 +387,47 @@ object GUI {
     })
 
     scrollPane.setBorder(indexBorder)
-    scrollPane.setBounds(375, 435, 700, 385)
-    panel.add(scrollPane)
+    scrollPane
+  }
+
+  def createScoreArea(): JScrollPane = {
+    scoreTextArea.setEditable(false)
+    scoreBorder.setTitleColor(Color.MAGENTA)
+    val scrollPane = new JScrollPane(scoreTextArea)
+
+    val scoreRowHeader = new JTextArea("0")
+    scoreRowHeader.setEditable(false)
+    scrollPane.setRowHeaderView(scoreRowHeader)
+
+    scoreTextArea.getDocument.addDocumentListener(new DocumentListener {
+      override def insertUpdate(e: DocumentEvent): Unit = updateRowHeader()
+      override def removeUpdate(e: DocumentEvent): Unit = updateRowHeader()
+      override def changedUpdate(e: DocumentEvent): Unit = updateRowHeader()
+      private def updateRowHeader(): Unit = {
+        val text = indexTextArea.getText()
+        val numRows = text.count(_ == '\n') + 1
+        val rowHeaderText = (1 to numRows).mkString("\t|  \n")
+        scoreRowHeader.setText(rowHeaderText)
+      }
+    })
+
+    scrollPane.setBorder(scoreBorder)
+    scrollPane
+  }
+
+  def createOutputArea(panel: JPanel): Unit = {
+    val tabbedPane = new JTabbedPane()
+    tabbedPane.setBounds(25, 435, 1050, 385)
+
+    val vocabularyPane = createVocabArea()
+    val indexPane = createIndexArea()
+    val scorePane = createScoreArea()
+    
+    tabbedPane.addTab("Vocabulary", vocabTabIcon, vocabularyPane, "Show built vocabulary.")
+    tabbedPane.addTab("Index", indexTabIcon, indexPane, "Show built or loaded index.")
+    tabbedPane.addTab("Score", scoreTabIcon, scorePane, "Show ranked documents.")
+
+    panel.add(tabbedPane)
   }
 
   def createSearchArea(panel: JPanel): Unit = {
