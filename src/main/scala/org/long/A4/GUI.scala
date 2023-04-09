@@ -407,6 +407,8 @@ object GUI {
 
     // create second text area
     term2TextArea.getInputMap().put(KeyStroke.getKeyStroke("ENTER"), "none")
+    term2TextArea.setEnabled(false)
+    term2TextArea.setBackground(Color.GRAY)
     val termBorder2 = BorderFactory.createTitledBorder("Term B:")
     val termScrollPane2 = new JScrollPane(term2TextArea)
     termScrollPane2.setVerticalScrollBarPolicy(
@@ -421,13 +423,28 @@ object GUI {
     optionComboBox.setBorder(optionBorder)
     optionComboBox.setBounds(575, 35, 225, 50)
     val options = List(
-      "Search: A",
-      "Search: A AND B",
-      "Search: A OR B",
-      "Search: A AND (NOT B)",
-      "Search: A OR (NOT B)"
+      "Boolean: A",
+      "Boolean: A AND B",
+      "Boolean: A OR B",
+      "Boolean: A AND (NOT B)",
+      "Boolean: A OR (NOT B)",
+      "Ranked"
     )
     options.foreach(optionComboBox.addItem(_))
+
+    optionComboBox.addActionListener(new ActionListener {
+      override def actionPerformed(e: ActionEvent): Unit = {
+        if (optionComboBox.getSelectedIndex() == 0 || optionComboBox.getSelectedIndex() == 5) {
+          term2TextArea.setText("")          
+          term2TextArea.setEnabled(false)
+          term2TextArea.setBackground(Color.GRAY)
+        }
+        else {
+          term2TextArea.setEnabled(true)
+          term2TextArea.setBackground(Color.WHITE)
+        }
+      }
+    })
 
     // create search button
     val searchBtn = new JButton(searchIcon)
@@ -475,6 +492,12 @@ object GUI {
                       else {
                         optionSearchOrNot(globalIndex)
                       }
+            case 5 => if (term1TextArea.getText() == "") {
+                        JOptionPane.showMessageDialog(null, "Term A was empty!", "Error", JOptionPane.ERROR_MESSAGE, errorIcon)
+                      }
+                      else {
+                        optionSearchRanked()
+                      } 
           }          
         }
       }
@@ -638,6 +661,10 @@ object GUI {
       queryTextArea.setText(firstTermTxt + " OR (NOT " + secondTermTxt + ")" + "\t\t| " + searchResultTxt.length + " results")
       searchResultTextArea.setText(searchResultTxt.mkString(" "))
     }
+  }
+
+  def optionSearchRanked(): Unit = {
+    println("Search result")
   }
 
   def createLoadingFrame() = {
