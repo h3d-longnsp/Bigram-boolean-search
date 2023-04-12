@@ -13,4 +13,4 @@ libraryDependencies ++= Seq(
 )
 
 assembly / mainClass := Some("org.long.A4.GUI")
-assembly / assemblyJarName := "bigram-boolean-search.jar"
+assembly / assemblyJarName := "ranked-search.jar"
